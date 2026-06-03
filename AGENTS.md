@@ -164,8 +164,8 @@ supabase/
 
 ```dart
 // core/theme/app_theme.dart
-final _headingFont = GoogleFonts.spaceGroteskTextTheme();
-final _bodyFont    = GoogleFonts.dmSansTextTheme();
+final _headingFont = GoogleFonts.bricolageGrotesqueTextTheme();
+final _bodyFont    = GoogleFonts.googleSansFlexTextTheme();
 ```
 
 Never define explicit font sizes. Flutter's `TextTheme` scales correctly with the OS accessibility settings. Always reference text styles by semantic name:
@@ -251,15 +251,15 @@ static ThemeData light() => ThemeData(
     surfaceContainerHigh:   AppColors.lightSurfaceContainerHigh,
     outline:                AppColors.lightOutline,
   ),
-  textTheme: GoogleFonts.spaceGroteskTextTheme()
+  textTheme: GoogleFonts.bricolageGrotesqueTextTheme()
     .copyWith(
-      // Override body/label styles to use DM Sans
-      bodyLarge:   GoogleFonts.dmSans(),
-      bodyMedium:  GoogleFonts.dmSans(),
-      bodySmall:   GoogleFonts.dmSans(),
-      labelLarge:  GoogleFonts.dmSans(),
-      labelMedium: GoogleFonts.dmSans(),
-      labelSmall:  GoogleFonts.dmSans(),
+      // Override body/label styles to use googleSansFlex
+      bodyLarge:   GoogleFonts.googleSansFlex(),
+      bodyMedium:  GoogleFonts.googleSansFlex(),
+      bodySmall:   GoogleFonts.googleSansFlex(),
+      labelLarge:  GoogleFonts.googleSansFlex(),
+      labelMedium: GoogleFonts.googleSansFlex(),
+      labelSmall:  GoogleFonts.googleSansFlex(),
     ),
 );
 
@@ -280,14 +280,14 @@ static ThemeData dark() => ThemeData(
     surfaceContainerHigh:   AppColors.darkSurfaceContainerHigh,
     outline:                AppColors.darkOutline,
   ),
-  textTheme: GoogleFonts.spaceGroteskTextTheme(ThemeData.dark().textTheme)
+  textTheme: GoogleFonts.bricolageGrotesqueTextTheme(ThemeData.dark().textTheme)
     .copyWith(
-      bodyLarge:   GoogleFonts.dmSans(color: AppColors.darkOnSurface),
-      bodyMedium:  GoogleFonts.dmSans(color: AppColors.darkOnSurface),
-      bodySmall:   GoogleFonts.dmSans(color: AppColors.darkOnSurfaceVariant),
-      labelLarge:  GoogleFonts.dmSans(color: AppColors.darkOnSurface),
-      labelMedium: GoogleFonts.dmSans(color: AppColors.darkOnSurfaceVariant),
-      labelSmall:  GoogleFonts.dmSans(color: AppColors.darkOnSurfaceVariant),
+      bodyLarge:   GoogleFonts.googleSansFlex(color: AppColors.darkOnSurface),
+      bodyMedium:  GoogleFonts.googleSansFlex(color: AppColors.darkOnSurface),
+      bodySmall:   GoogleFonts.googleSansFlex(color: AppColors.darkOnSurfaceVariant),
+      labelLarge:  GoogleFonts.googleSansFlex(color: AppColors.darkOnSurface),
+      labelMedium: GoogleFonts.googleSansFlex(color: AppColors.darkOnSurfaceVariant),
+      labelSmall:  GoogleFonts.googleSansFlex(color: AppColors.darkOnSurfaceVariant),
     ),
 );
 ```
@@ -331,6 +331,7 @@ MaterialApp.router(
 - **Use native Flutter widgets** themed via `ThemeData` — do not reinvent `DropdownButton`, `FilterChip`, `NavigationRail`, `Drawer`, `BottomSheet`, `Chip`, `TextFormField`, `AlertDialog`
 - **Create custom widgets** only when Flutter has no equivalent: `ProductCard`, `QtyStepper`, `BranchSwitcher`, `StatCard`, `ConnectivityDot`, `TabListItem`
 - Custom widgets: `shared/widgets/` for global ones, `features/X/widgets/` for feature-specific
+- **NEVER USE CIRCLEPROGRESSINDICATOR FOR LOADING STATES FOR PAGES. USE SHIMMER SKELETON FROM shimmer package**
 
 ### Responsive layout
 - **Windows desktop**: persistent `NavigationRail`. 188px expanded, 64px collapsed (icons only). Toggle on leading AppBar icon.

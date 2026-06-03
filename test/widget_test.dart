@@ -1,30 +1,45 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:paps_n_pops/main.dart';
+import 'package:paps_n_pops/domain/models/branch.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('Branch Model Tests', () {
+    test('fromMap should parse correctly', () {
+      final json = {
+        'id': 'branch-uuid-123',
+        'name': 'Main Branch Nairobi',
+        'location': 'Westlands, Nairobi',
+        'phone': '0712345678',
+        'created_at': '2026-06-01T00:00:00.000Z',
+      };
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      final branch = Branch.fromMap(json);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(branch.id, equals('branch-uuid-123'));
+      expect(branch.name, equals('Main Branch Nairobi'));
+      expect(branch.location, equals('Westlands, Nairobi'));
+      expect(branch.phone, equals('0712345678'));
+      expect(
+        branch.createdAt,
+        equals(DateTime.parse('2026-06-01T00:00:00.000Z')),
+      );
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('toMap should serialize correctly', () {
+      final branch = Branch(
+        id: 'branch-uuid-123',
+        name: 'Main Branch Nairobi',
+        location: 'Westlands, Nairobi',
+        phone: '0712345678',
+        createdAt: DateTime.parse('2026-06-01T00:00:00.000Z'),
+      );
+
+      final json = branch.toMap();
+
+      expect(json['id'], equals('branch-uuid-123'));
+      expect(json['name'], equals('Main Branch Nairobi'));
+      expect(json['location'], equals('Westlands, Nairobi'));
+      expect(json['phone'], equals('0712345678'));
+      expect(json['created_at'], equals('2026-06-01T00:00:00.000Z'));
+    });
   });
 }

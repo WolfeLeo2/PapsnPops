@@ -1,0 +1,34 @@
+config:
+  edition: 3
+
+streams:
+  # Global data that is not scoped to a specific branch. 
+  # All users get exactly one copy of these tables.
+  global_data:
+    auto_subscribe: true
+    queries:
+      - SELECT * FROM products
+      - SELECT * FROM product_variants
+      - SELECT * FROM categories
+      - SELECT * FROM adjustment_reasons
+      - SELECT * FROM promotions
+      - SELECT * FROM customers
+      - SELECT * FROM branches
+      - SELECT * FROM user_profiles
+
+  # Branch data scoped to the branches the user has access to.
+  # We extract the branch IDs from the JWT metadata array.
+  branch_data:
+    auto_subscribe: true
+    with:
+      user_branches: SELECT branch_id FROM user_branch_access WHERE user_id = auth.user_id()
+    queries:
+      - SELECT stock_levels.* FROM stock_levels INNER JOIN user_branches ON stock_levels.branch_id = user_branches.branch_id
+      - SELECT stock_movements.* FROM stock_movements INNER JOIN user_branches ON stock_movements.branch_id = user_branches.branch_id
+      - SELECT sales.* FROM sales INNER JOIN user_branches ON sales.branch_id = user_branches.branch_id
+      - SELECT sale_items.* FROM sale_items WHERE sale_id IN (SELECT sales.id FROM sales INNER JOIN user_branches ON sales.branch_id = user_branches.branch_id)
+      - SELECT open_tabs.* FROM open_tabs INNER JOIN user_branches ON open_tabs.branch_id = user_branches.branch_id
+      - SELECT tab_items.* FROM tab_items WHERE tab_id IN (SELECT open_tabs.id FROM open_tabs INNER JOIN user_branches ON open_tabs.branch_id = user_branches.branch_id)
+      - SELECT staff.* FROM staff INNER JOIN user_branches ON staff.branch_id = user_branches.branch_id
+      - SELECT invoices.* FROM invoices INNER JOIN user_branches ON invoices.branch_id = user_branches.branch_id
+      - SELECT cash_reconciliations.* FROM cash_reconciliations INNER JOIN user_branches ON cash_reconciliations.branch_id = user_branches.branch_id
