@@ -238,8 +238,8 @@ class VariantSelectionSheet extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Icon(
-                          Icons.chevron_right_rounded,
+                        PhosphorIcon(
+                          PhosphorIconsRegular.caretRight,
                           color: cs.onSurfaceVariant.withValues(alpha: 0.5),
                         ),
                       ],

@@ -3,12 +3,38 @@ import '../../domain/models/cart_item.dart';
 import '../../domain/models/product.dart';
 import '../../domain/models/product_variant.dart';
 import '../../domain/models/promotion.dart';
+import '../../domain/models/applied_promotion.dart';
 import '../../core/utils/promotion_engine.dart';
 import '../../data/repositories/product_repository.dart';
 import '../../data/repositories/promotion_repository.dart';
 import '../../domain/models/product_with_variants.dart';
+import '../../data/powersync/powersync_client.dart';
+import '../../data/repositories/branch_provider.dart';
 
 part 'pos_provider.g.dart';
+
+@riverpod
+Stream<List<Map<String, dynamic>>> activeStaff(Ref ref) {
+  final branchId = ref.watch(currentBranchIdProvider);
+  if (branchId == null) {
+    return Stream.value([]);
+  }
+  return db.watch(
+    'SELECT id, name FROM staff WHERE branch_id = ? AND is_active = 1 ORDER BY name ASC',
+    parameters: [branchId],
+  );
+}
+
+@riverpod
+List<AppliedPromotion> appliedPromotions(Ref ref) {
+  final cartItems = ref.watch(cartProvider);
+  final activePromotions = ref.watch(promotionsProvider).value ?? [];
+  return PromotionEngine.calculatePromotions(
+    cartItems: cartItems,
+    activePromotions: activePromotions,
+    now: DateTime.now(),
+  );
+}
 
 @riverpod
 Stream<List<Promotion>> promotions(Ref ref) {

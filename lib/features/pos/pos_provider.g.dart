@@ -9,6 +9,94 @@ part of 'pos_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(activeStaff)
+final activeStaffProvider = ActiveStaffProvider._();
+
+final class ActiveStaffProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          Stream<List<Map<String, dynamic>>>
+        >
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $StreamProvider<List<Map<String, dynamic>>> {
+  ActiveStaffProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'activeStaffProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$activeStaffHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<Map<String, dynamic>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<Map<String, dynamic>>> create(Ref ref) {
+    return activeStaff(ref);
+  }
+}
+
+String _$activeStaffHash() => r'45b382562b8dc3fdfb8b2d869ca03565a2fcacf0';
+
+@ProviderFor(appliedPromotions)
+final appliedPromotionsProvider = AppliedPromotionsProvider._();
+
+final class AppliedPromotionsProvider
+    extends
+        $FunctionalProvider<
+          List<AppliedPromotion>,
+          List<AppliedPromotion>,
+          List<AppliedPromotion>
+        >
+    with $Provider<List<AppliedPromotion>> {
+  AppliedPromotionsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appliedPromotionsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appliedPromotionsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<AppliedPromotion>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  List<AppliedPromotion> create(Ref ref) {
+    return appliedPromotions(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<AppliedPromotion> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<AppliedPromotion>>(value),
+    );
+  }
+}
+
+String _$appliedPromotionsHash() => r'f189100f48fde0823981242fee8159fa29895212';
+
 @ProviderFor(promotions)
 final promotionsProvider = PromotionsProvider._();
 
@@ -46,7 +134,7 @@ final class PromotionsProvider
   }
 }
 
-String _$promotionsHash() => r'4249811d4fb4e7db0e2b311aae8b3f76d81cb3b8';
+String _$promotionsHash() => r'7457e54fe26a963530ef6d8326a6539c5e0b8285';
 
 @ProviderFor(Cart)
 final cartProvider = CartProvider._();
