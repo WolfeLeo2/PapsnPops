@@ -16,4 +16,18 @@ class CartItem {
 
   int get subtotal => variant.sellingPrice * quantity;
   int get lineTotal => subtotal - discountAmount;
+
+  CartItem copyWith({
+    Product? product,
+    ProductVariant? variant,
+    int? quantity,
+    int? discountAmount,
+  }) {
+    return CartItem(
+      product: product ?? this.product,
+      variant: variant ?? this.variant,
+      quantity: quantity ?? this.quantity,
+      discountAmount: discountAmount ?? this.discountAmount,
+    );
+  }
 }

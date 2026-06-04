@@ -110,10 +110,9 @@ const schema = Schema([
   Table('promotions', [
     Column.text('name'),
     Column.text('type'),
-    Column.integer('discount_value'),
-    Column.integer('min_quantity'),
-    Column.text('buy_product_id'),
-    Column.text('get_product_id'),
+    Column.integer('value'),
+    Column.text('target_type'),
+    Column.text('target_value'),
     Column.text('valid_from'),
     Column.text('valid_until'),
     Column.integer('is_active'),
