@@ -48,7 +48,7 @@ final class TodaySalesProvider
   }
 }
 
-String _$todaySalesHash() => r'43b62d2f21218a703819a6731ee603642c8e2561';
+String _$todaySalesHash() => r'd956bc57214ebea048eb99fdd239753eb8b5abde';
 
 @ProviderFor(activeReconciliations)
 final activeReconciliationsProvider = ActiveReconciliationsProvider._();
@@ -136,7 +136,7 @@ final class DashboardMetricsProvider
   }
 }
 
-String _$dashboardMetricsHash() => r'297b43fd4afecfc2314926b336927e1848f408da';
+String _$dashboardMetricsHash() => r'2af84d0069f9cd56cffd9cd5109eaeca42c7b4ac';
 
 @ProviderFor(recentSales)
 final recentSalesProvider = RecentSalesProvider._();
@@ -175,7 +175,7 @@ final class RecentSalesProvider
   }
 }
 
-String _$recentSalesHash() => r'015f5d6d7c269041df7e2383e90677de91f6f18f';
+String _$recentSalesHash() => r'a2cc484146144d01581b48125fbefba9fc2dff7d';
 
 @ProviderFor(stockLevels)
 final stockLevelsProvider = StockLevelsProvider._();

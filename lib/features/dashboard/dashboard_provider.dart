@@ -108,7 +108,7 @@ Stream<List<Map<String, dynamic>>> todaySales(Ref ref) {
 
   return db.watch(
     '''
-    SELECT total_amount, payment_method, created_at 
+    SELECT total, payment_method, created_at 
     FROM sales 
     WHERE branch_id = ? 
       AND (is_voided = 0 OR is_voided IS NULL) 
@@ -145,7 +145,7 @@ DashboardMetrics dashboardMetrics(Ref ref) {
   int expectedCash = 0;
 
   for (final sale in sales) {
-    final amount = sale['total_amount'] as int? ?? 0;
+    final amount = sale['total'] as int? ?? 0;
     todayRevenue += amount;
 
     final pm = (sale['payment_method'] as String? ?? '').toLowerCase();
@@ -172,7 +172,7 @@ DashboardMetrics dashboardMetrics(Ref ref) {
     final hour = dateTime.hour;
     final segmentIndex = (hour / 4).floor().clamp(0, 5);
 
-    final amount = (sale['total_amount'] as int? ?? 0).toDouble();
+    final amount = (sale['total'] as int? ?? 0).toDouble();
     revenueTrend[segmentIndex] += amount;
     salesCountTrend[segmentIndex] += 1.0;
 
@@ -211,7 +211,7 @@ Stream<List<RecentSale>> recentSales(Ref ref) {
   return db
       .watch(
         '''
-    SELECT s.id as sale_id, s.total_amount, s.payment_method, s.created_at,
+    SELECT s.id as sale_id, s.total, s.payment_method, s.created_at,
            si.quantity, p.name as product_name
     FROM sales s
     LEFT JOIN sale_items si ON s.id = si.sale_id
@@ -232,7 +232,7 @@ Stream<List<RecentSale>> recentSales(Ref ref) {
             orderedSaleIds.add(saleId);
             salesMap[saleId] = RecentSale(
               id: saleId,
-              totalAmount: row['total_amount'] as int? ?? 0,
+              totalAmount: row['total'] as int? ?? 0,
               paymentMethod: row['payment_method'] as String? ?? 'cash',
               createdAt:
                   DateTime.tryParse(
