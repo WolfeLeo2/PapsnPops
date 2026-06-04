@@ -9,6 +9,7 @@ import 'shared/widgets/app_scaffold.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/pos/pos_screen.dart';
 import 'features/tabs/tabs_screen.dart';
+import 'features/sales_history/sales_history_screen.dart';
 import 'features/stock/products_screen.dart';
 import 'features/stock/receive_stock_screen.dart';
 import 'features/reports/reports_screen.dart';
@@ -100,6 +101,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '/tabs',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: TabsScreen()),
+          ),
+          GoRoute(
+            path: '/sales',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SalesHistoryScreen()),
           ),
           GoRoute(
             path: '/products',

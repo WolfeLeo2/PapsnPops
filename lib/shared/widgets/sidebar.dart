@@ -238,6 +238,15 @@ class Sidebar extends ConsumerWidget {
                     isMobile: isMobile,
                     badgeCount: openTabsCount,
                   ),
+                  SidebarItem(
+                    label: 'Sales',
+                    path: '/sales',
+                    regularIcon: PhosphorIconsRegular.receipt,
+                    fillIcon: PhosphorIconsFill.receipt,
+                    isExpanded: isExpanded,
+                    currentPath: currentPath,
+                    isMobile: isMobile,
+                  ),
 
                   sectionHeader('INVENTORY'),
                   SidebarItem(
