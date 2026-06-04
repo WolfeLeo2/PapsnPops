@@ -9,7 +9,7 @@ class AppTypography {
 
   static TextTheme _buildTextTheme(Color baseColor) {
     // We start with Outfit as the base for everything
-    final baseTheme = GoogleFonts.outfitTextTheme().apply(
+    final baseTheme = GoogleFonts.googleSansFlexTextTheme().apply(
       displayColor: baseColor,
       bodyColor: baseColor,
     );
@@ -77,17 +77,17 @@ class AppTypography {
       ),
 
       // LABELS (Outfit - UI Elements)
-      labelLarge: GoogleFonts.outfit(
+      labelLarge: GoogleFonts.googleSansFlex(
         fontWeight: FontWeight.w600, // Important for buttons
         letterSpacing: 0.1,
         color: baseColor,
       ),
-      labelMedium: GoogleFonts.outfit(
+      labelMedium: GoogleFonts.googleSansFlex(
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
         color: baseColor,
       ),
-      labelSmall: GoogleFonts.outfit(
+      labelSmall: GoogleFonts.googleSansFlex(
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
         color: baseColor,

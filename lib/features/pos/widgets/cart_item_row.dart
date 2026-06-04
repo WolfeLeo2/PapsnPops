@@ -41,6 +41,7 @@ class CartItemRow extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${item.product.name} removed from cart'),
+            duration: Duration(milliseconds: 1000),
             action: SnackBarAction(
               label: 'Undo',
               onPressed: () {
