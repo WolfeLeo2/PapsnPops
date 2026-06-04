@@ -91,7 +91,9 @@ const schema = Schema([
     Column.text('phone'),
     Column.integer('is_open'),
     Column.text('opened_by'),
+    Column.text('customer_id'),
     Column.text('created_at'),
+    Column.text('updated_at'),
     Column.text('closed_at'),
     Column.text('sale_id'),
   ]),
@@ -145,6 +147,8 @@ const schema = Schema([
     Column.text('invoice_number'),
     Column.text('due_date'),
     Column.text('status'),
+    Column.text('notes'),
+    Column.text('paid_at'),
     Column.text('created_at'),
   ]),
   Table('cash_reconciliations', [
