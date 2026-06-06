@@ -697,3 +697,4 @@ Settings screen is owner-only and organised into sections:
 - Do not hardcode any IDs
 - Do not call `supabase.auth.admin.createUser()` from Flutter — use the `create-user` Edge Function
 - Do not add Edge Functions beyond `create-user` without strong justification — the architecture needs none
+- Do not use Dart scripts, node scripts, or `psql` to query or modify the remote Supabase database. ALWAYS use the `supabase` MCP tools directly to interact with the database.

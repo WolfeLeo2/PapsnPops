@@ -60,6 +60,31 @@ class Auth extends _$Auth {
     await supabase.auth.updateUser(UserAttributes(password: newPassword));
   }
 
+  Future<void> createUser({
+    required String email,
+    required String password,
+    required String fullName,
+    required String role,
+    required String organisationId,
+    required List<String> branchIds,
+  }) async {
+    final response = await supabase.functions.invoke(
+      'create-user',
+      body: {
+        'email': email,
+        'password': password,
+        'full_name': fullName,
+        'role': role,
+        'organisation_id': organisationId,
+        'branch_ids': branchIds,
+      },
+    );
+
+    if (response.status != 200) {
+      throw Exception('Failed to create user: ${response.data}');
+    }
+  }
+
   Future<void> loginWithPassword(String email, String password) async {
     await supabase.auth.signInWithPassword(email: email, password: password);
   }

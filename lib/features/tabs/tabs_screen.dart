@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../shared/widgets/app_scaffold.dart';
+import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/stat_card.dart';
 import '../../domain/models/open_tab.dart';
 import '../../domain/models/customer.dart';
@@ -11,8 +11,8 @@ import '../../core/utils/currency.dart';
 import '../../data/repositories/tab_repository.dart';
 import '../../data/repositories/customer_repository.dart';
 import '../../data/repositories/branch_provider.dart';
-import '../../features/auth/auth_provider.dart';
 import '../stock/stock_provider.dart' show generateV4Uuid;
+import '../pos/pos_provider.dart' show activeStaffProvider;
 import 'tabs_provider.dart';
 import 'widgets/tab_card.dart';
 import 'widgets/tab_detail_panel.dart';
@@ -35,8 +35,7 @@ class TabsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Open Tabs',
-          style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          'Open Tabs'
         ),
         leading: Builder(
           builder: (context) {
@@ -58,7 +57,7 @@ class TabsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Summary Stats Bar
+          // Summary Stats Bar (Square POS minimalist style)
           summaryAsync.when(
             data: (summary) {
               final longestMin = summary['longest_open_minutes'] as int;
@@ -73,37 +72,23 @@ class TabsScreen extends ConsumerWidget {
 
               return Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cardWidth = (constraints.maxWidth - 32) / (isDesktop ? 3 : 1);
-                    return Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: [
-                        SizedBox(
-                          width: cardWidth,
-                          child: StatCard(
-                            title: 'Active Tabs',
-                            value: '${summary['count']}',
-                          ),
-                        ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: StatCard(
-                            title: 'Outstanding Balance',
-                            value: CurrencyHelper.format(summary['total'] as int),
-                          ),
-                        ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: StatCard(
-                            title: 'Longest Open Tab',
-                            value: longestStr,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+                  ),
+                  child: Wrap(
+                    spacing: 48,
+                    runSpacing: 24,
+                    alignment: WrapAlignment.spaceBetween,
+                    children: [
+                      _buildStatItem(context, 'Active Tabs', '${summary['count']}'),
+                      _buildStatItem(context, 'Outstanding', CurrencyHelper.format(summary['total'] as int)),
+                      _buildStatItem(context, 'Longest Open', longestStr),
+                    ],
+                  ),
                 ),
               );
             },
@@ -132,30 +117,10 @@ class TabsScreen extends ConsumerWidget {
                 });
 
                 if (tabs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        PhosphorIcon(
-                          PhosphorIconsRegular.folders,
-                          size: 64,
-                          color: cs.onSurfaceVariant.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No open tabs',
-                          style: tt.headlineSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tap the button below to open a new bar tab.',
-                          style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
+                  return const EmptyState(
+                    title: 'No open tabs',
+                    message: 'Tap the button below to open a new bar tab.',
+                    icon: PhosphorIconsDuotone.folders,
                   );
                 }
 
@@ -284,8 +249,9 @@ class TabsScreen extends ConsumerWidget {
     String? selectedCustomerId;
     List<Customer> suggestions = [];
     bool showSuggestions = false;
+    String? selectedStaffId;
 
-    final tt = Theme.of(context).textTheme;
+    final staffAsync = ref.read(activeStaffProvider);
     final cs = Theme.of(context).colorScheme;
 
     await showDialog(
@@ -331,7 +297,7 @@ class TabsScreen extends ConsumerWidget {
                       controller: nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Tab Name / Table Number',
-                        prefixIcon: Icon(Icons.label_outline),
+                        prefixIcon: PhosphorIcon(PhosphorIconsRegular.tag),
                         border: OutlineInputBorder(),
                       ),
                       textCapitalization: TextCapitalization.words,
@@ -371,10 +337,40 @@ class TabsScreen extends ConsumerWidget {
                       controller: phoneCtrl,
                       decoration: const InputDecoration(
                         labelText: 'Phone Number (Optional)',
-                        prefixIcon: Icon(Icons.phone_outlined),
+                        prefixIcon: PhosphorIcon(PhosphorIconsRegular.phone),
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 12),
+                    staffAsync.when(
+                      data: (staffList) {
+                        return DropdownButtonFormField<String>(
+                          value: selectedStaffId,
+                          hint: const Text('Opened By (Optional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Opened By Staff (Optional)',
+                            prefixIcon: PhosphorIcon(PhosphorIconsRegular.user),
+                            border: OutlineInputBorder(),
+                          ),
+                          items: staffList.map((s) {
+                            return DropdownMenuItem<String>(
+                              value: s['id'] as String,
+                              child: Text(s['name'] as String),
+                            );
+                          }).toList(),
+                          onChanged: (val) => setDialogState(() => selectedStaffId = val),
+                        );
+                      },
+                      loading: () => Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: cs.surfaceContainer,
+                          border: Border.all(color: cs.outline),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      error: (_, __) => const SizedBox(),
                     ),
                   ],
                 ),
@@ -391,7 +387,6 @@ class TabsScreen extends ConsumerWidget {
                     final scaffold = ScaffoldMessenger.of(context);
                     final nav = Navigator.of(context);
                     
-                    final authState = ref.read(authProvider);
                     final branchId = ref.read(currentBranchIdProvider);
 
                     if (branchId == null) {
@@ -406,7 +401,7 @@ class TabsScreen extends ConsumerWidget {
                       branchId: branchId,
                       name: nameCtrl.text.trim(),
                       phone: phoneCtrl.text.trim().isNotEmpty ? phoneCtrl.text.trim() : null,
-                      openedBy: authState?.id,
+                      openedBy: selectedStaffId,
                       customerId: selectedCustomerId,
                       isOpen: true,
                       createdAt: DateTime.now(),
@@ -432,6 +427,34 @@ class TabsScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String label, String value) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final tt = theme.textTheme;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: tt.labelSmall?.copyWith(
+            color: cs.onSurfaceVariant,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: tt.headlineMedium?.copyWith(
+            color: cs.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }

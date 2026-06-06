@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../shared/widgets/app_scaffold.dart';
 import '../../domain/models/sale.dart';
 import '../../core/utils/currency.dart';
+import '../../shared/widgets/empty_state.dart';
 import 'sales_history_provider.dart';
 import 'sale_detail_screen.dart';
 
@@ -29,8 +30,7 @@ class SalesHistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Sales & Invoices',
-          style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          'Sales & Invoices'
         ),
         leading: Builder(
           builder: (context) {
@@ -53,161 +53,156 @@ class SalesHistoryScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Filter Bar
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: cs.outline),
-              ),
-              color: cs.surfaceContainerLow,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: cs.outlineVariant)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Row 1: Search & Date Picker
+                Row(
                   children: [
-                    // Row 1: Search & Date Picker
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search by ID, customer name/phone, or product...',
-                              prefixIcon: const PhosphorIcon(PhosphorIconsRegular.magnifyingGlass, size: 20),
-                              suffixIcon: searchQuery.isNotEmpty
-                                  ? IconButton(
-                                      icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 18),
-                                      onPressed: () => ref.read(salesSearchQueryProvider.notifier).set(''),
-                                    )
-                                  : null,
-                              filled: true,
-                              fillColor: cs.surface,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                            ),
-                            onChanged: (val) => ref.read(salesSearchQueryProvider.notifier).set(val),
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search by ID, customer name/phone, or product...',
+                          prefixIcon: const PhosphorIcon(PhosphorIconsRegular.magnifyingGlass, size: 20),
+                          suffixIcon: searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const PhosphorIcon(PhosphorIconsRegular.x, size: 18),
+                                  onPressed: () => ref.read(salesSearchQueryProvider.notifier).set(''),
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: cs.surfaceContainerHigh,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
                         ),
-                        const SizedBox(width: 12),
-                        // Date picker
-                        Expanded(
-                          flex: 2,
-                          child: OutlinedButton.icon(
-                            onPressed: () async {
-                              final range = await showDateRangePicker(
-                                context: context,
-                                firstDate: DateTime(2025),
-                                lastDate: DateTime.now().add(const Duration(days: 1)),
-                                initialDateRange: dateRange,
-                              );
-                              ref.read(salesDateRangeProvider.notifier).set(range);
-                            },
-                            icon: const PhosphorIcon(PhosphorIconsRegular.calendar, size: 18),
-                            label: Text(
-                              dateRange == null
-                                  ? 'All Dates'
-                                  : '${DateFormat('dd/MM').format(dateRange.start)} - ${DateFormat('dd/MM').format(dateRange.end)}',
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(0, 48),
-                              backgroundColor: cs.surface,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (dateRange != null) ...[
-                          const SizedBox(width: 4),
-                          IconButton(
-                            icon: const PhosphorIcon(PhosphorIconsRegular.xCircle, size: 20),
-                            onPressed: () => ref.read(salesDateRangeProvider.notifier).set(null),
-                          ),
-                        ],
-                      ],
+                        onChanged: (val) => ref.read(salesSearchQueryProvider.notifier).set(val),
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    
-                    // Row 2: Payment Method and Source chips
-                    Row(
-                      children: [
-                        Text('Payment:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('All'),
-                          selected: paymentMethod == null,
-                          onSelected: (val) {
-                            if (val) ref.read(salesPaymentMethodProvider.notifier).set(null);
-                          },
+                    const SizedBox(width: 12),
+                    // Date picker
+                    Expanded(
+                      flex: 2,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final range = await showDateRangePicker(
+                            context: context,
+                            firstDate: DateTime(2025),
+                            lastDate: DateTime.now().add(const Duration(days: 1)),
+                            initialDateRange: dateRange,
+                          );
+                          ref.read(salesDateRangeProvider.notifier).set(range);
+                        },
+                        icon: const PhosphorIcon(PhosphorIconsRegular.calendar, size: 18),
+                        label: Text(
+                          dateRange == null
+                              ? 'All Dates'
+                              : '${DateFormat('dd/MM').format(dateRange.start)} - ${DateFormat('dd/MM').format(dateRange.end)}',
                         ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('Cash'),
-                          selected: paymentMethod == 'cash',
-                          onSelected: (val) {
-                            ref.read(salesPaymentMethodProvider.notifier).set(val ? 'cash' : null);
-                          },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 48),
+                          backgroundColor: cs.surface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('M-Pesa'),
-                          selected: paymentMethod == 'mpesa',
-                          onSelected: (val) {
-                            ref.read(salesPaymentMethodProvider.notifier).set(val ? 'mpesa' : null);
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('Card'),
-                          selected: paymentMethod == 'card',
-                          onSelected: (val) {
-                            ref.read(salesPaymentMethodProvider.notifier).set(val ? 'card' : null);
-                          },
-                        ),
-                        const Spacer(),
-                        Text('Source:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('All'),
-                          selected: source == null,
-                          onSelected: (val) {
-                            if (val) ref.read(salesSourceProvider.notifier).set(null);
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('POS'),
-                          selected: source == 'pos',
-                          onSelected: (val) {
-                            ref.read(salesSourceProvider.notifier).set(val ? 'pos' : null);
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('Tab'),
-                          selected: source == 'tab',
-                          onSelected: (val) {
-                            ref.read(salesSourceProvider.notifier).set(val ? 'tab' : null);
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: const Text('Invoice'),
-                          selected: source == 'invoice',
-                          onSelected: (val) {
-                            ref.read(salesSourceProvider.notifier).set(val ? 'invoice' : null);
-                          },
-                        ),
-                      ],
+                      ),
                     ),
+                    if (dateRange != null) ...[
+                      const SizedBox(width: 4),
+                      IconButton(
+                        icon: const PhosphorIcon(PhosphorIconsRegular.xCircle, size: 20),
+                        onPressed: () => ref.read(salesDateRangeProvider.notifier).set(null),
+                      ),
+                    ],
                   ],
                 ),
-              ),
+                const SizedBox(height: 16),
+                
+                // Row 2: Payment Method and Source chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Text('Payment:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('All'),
+                        selected: paymentMethod == null,
+                        onSelected: (val) {
+                          if (val) ref.read(salesPaymentMethodProvider.notifier).set(null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Cash'),
+                        selected: paymentMethod == 'cash',
+                        onSelected: (val) {
+                          ref.read(salesPaymentMethodProvider.notifier).set(val ? 'cash' : null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('M-Pesa'),
+                        selected: paymentMethod == 'mpesa',
+                        onSelected: (val) {
+                          ref.read(salesPaymentMethodProvider.notifier).set(val ? 'mpesa' : null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Card'),
+                        selected: paymentMethod == 'card',
+                        onSelected: (val) {
+                          ref.read(salesPaymentMethodProvider.notifier).set(val ? 'card' : null);
+                        },
+                      ),
+                      const SizedBox(width: 24),
+                      Text('Source:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('All'),
+                        selected: source == null,
+                        onSelected: (val) {
+                          if (val) ref.read(salesSourceProvider.notifier).set(null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('POS'),
+                        selected: source == 'pos',
+                        onSelected: (val) {
+                          ref.read(salesSourceProvider.notifier).set(val ? 'pos' : null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Tab'),
+                        selected: source == 'tab',
+                        onSelected: (val) {
+                          ref.read(salesSourceProvider.notifier).set(val ? 'tab' : null);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Invoice'),
+                        selected: source == 'invoice',
+                        onSelected: (val) {
+                          ref.read(salesSourceProvider.notifier).set(val ? 'invoice' : null);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -230,25 +225,10 @@ class SalesHistoryScreen extends ConsumerWidget {
                 });
 
                 if (sales.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        PhosphorIcon(
-                          PhosphorIconsRegular.receipt,
-                          size: 64,
-                          color: cs.onSurfaceVariant.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No sales records found',
-                          style: tt.headlineSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                  return const EmptyState(
+                    title: 'No sales records found',
+                    message: 'Try adjusting your filters or search query.',
+                    icon: PhosphorIconsDuotone.receipt,
                   );
                 }
 

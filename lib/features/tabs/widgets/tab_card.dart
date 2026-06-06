@@ -71,11 +71,11 @@ class _TabCardState extends ConsumerState<TabCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: widget.isSelected ? cs.primary : cs.outline,
-          width: widget.isSelected ? 2 : 1,
+          color: widget.isSelected ? cs.primary : Colors.transparent,
+          width: widget.isSelected ? 2 : 0,
         ),
       ),
-      color: widget.isSelected ? cs.primaryContainer.withOpacity(0.05) : cs.surfaceContainer,
+      color: widget.isSelected ? cs.primaryContainer.withOpacity(0.1) : cs.surfaceContainerHigh,
       child: InkWell(
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(16),

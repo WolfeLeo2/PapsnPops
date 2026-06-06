@@ -13,7 +13,13 @@ import 'features/sales_history/sales_history_screen.dart';
 import 'features/stock/products_screen.dart';
 import 'features/stock/receive_stock_screen.dart';
 import 'features/reports/reports_screen.dart';
+import 'features/settings/branch_settings.dart';
+import 'features/settings/business_settings.dart';
+import 'features/settings/promotions_screen.dart';
+import 'features/settings/add_promotion_screen.dart';
 import 'features/settings/settings_screen.dart';
+import 'features/settings/staff_settings.dart';
+import 'features/settings/user_accounts_screen.dart';
 import 'features/stock/product_detail_screen.dart';
 import 'features/auth/signup_screen.dart';
 import 'features/auth/verify_screen.dart';
@@ -24,6 +30,10 @@ import 'features/auth/reset_password_screen.dart';
 class ThemeModeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() => ThemeMode.system;
+
+  void setMode(ThemeMode mode) {
+    state = mode;
+  }
 }
 
 final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
@@ -141,6 +151,34 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '/settings',
             pageBuilder: (context, state) =>
                 NoTransitionPage(child: SettingsScreen()),
+            routes: [
+              GoRoute(
+                path: 'business',
+                builder: (context, state) => const BusinessSettings(),
+              ),
+              GoRoute(
+                path: 'branches',
+                builder: (context, state) => const BranchSettings(),
+              ),
+              GoRoute(
+                path: 'users',
+                builder: (context, state) => const UserAccountsScreen(),
+              ),
+              GoRoute(
+                path: 'staff',
+                builder: (context, state) => const StaffSettings(),
+              ),
+              GoRoute(
+                path: 'promotions',
+                builder: (context, state) => const PromotionsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'add',
+                    builder: (context, state) => const AddPromotionScreen(),
+                  ),
+                ],
+              ),
+            ],
             redirect: (context, state) {
               final user = ref.read(authProvider);
               final role = user?.userMetadata?['role'];

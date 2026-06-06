@@ -48,10 +48,9 @@ class _CartPanelState extends ConsumerState<CartPanel> {
     if (cartItems.isEmpty) return;
 
     final paymentMethod = ref.read(selectedPaymentMethodProvider);
-    if (paymentMethod == 'mpesa') {
-      if (!_formKey.currentState!.validate()) {
-        return;
-      }
+
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
 
     final branchId = ref.read(currentBranchIdProvider);
@@ -139,6 +138,10 @@ class _CartPanelState extends ConsumerState<CartPanel> {
   }
 
   void _handleSaveAsTab() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     final cartItems = ref.read(cartProvider);
     if (cartItems.isEmpty) return;
 
@@ -150,7 +153,7 @@ class _CartPanelState extends ConsumerState<CartPanel> {
       return;
     }
 
-    final authUser = ref.read(authProvider);
+    final selectedStaffId = ref.read(selectedStaffProvider);
 
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
@@ -219,7 +222,7 @@ class _CartPanelState extends ConsumerState<CartPanel> {
         branchId: branchId,
         name: nameCtrl.text.trim(),
         phone: phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
-        openedBy: authUser?.id,
+        openedBy: selectedStaffId,
         isOpen: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -236,7 +239,7 @@ class _CartPanelState extends ConsumerState<CartPanel> {
           variantName: item.variant.name,
           quantity: item.quantity,
           unitPrice: item.variant.sellingPrice,
-          addedBy: authUser?.id,
+          addedBy: selectedStaffId,
           createdAt: DateTime.now(),
         );
         await ref.read(tabRepositoryProvider).addTabItem(tabItem);
@@ -410,17 +413,13 @@ class _CartPanelState extends ConsumerState<CartPanel> {
                     return DropdownButtonFormField<String>(
                       initialValue: dropdownValue,
                       decoration: const InputDecoration(
-                        labelText: 'Floor Salesperson',
+                        labelText: 'Served By',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                       items: [
-                        const DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('None'),
-                        ),
                         ...staffList.map((staff) {
                           return DropdownMenuItem<String>(
                             value: staff['id'] as String,
@@ -428,6 +427,12 @@ class _CartPanelState extends ConsumerState<CartPanel> {
                           );
                         }),
                       ],
+                      validator: (val) {
+                        if (val == null || val.isEmpty) {
+                          return 'Please select a salesperson';
+                        }
+                        return null;
+                      },
                       onChanged: (val) {
                         ref.read(selectedStaffProvider.notifier).set(val);
                       },

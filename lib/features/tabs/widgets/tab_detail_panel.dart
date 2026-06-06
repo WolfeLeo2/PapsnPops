@@ -14,6 +14,7 @@ import '../../stock/stock_provider.dart' show generateV4Uuid;
 import '../../../data/powersync/powersync_client.dart';
 import '../../pos/pos_provider.dart' show activeStaffProvider;
 import '../../pos/widgets/receipt_screen.dart';
+import '../../../shared/widgets/qty_stepper.dart';
 import '../tabs_provider.dart';
 import 'tab_add_item_sheet.dart';
 
@@ -107,7 +108,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                 ElevatedButton.icon(
                   onPressed: () => TabAddItemSheet.show(
                     context: context,
-                    tabId: widget.tab.id,
+                    tab: widget.tab,
                   ),
                   icon: const PhosphorIcon(PhosphorIconsRegular.plus, size: 16),
                   label: const Text('Add Items'),
@@ -145,7 +146,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                         TextButton(
                           onPressed: () => TabAddItemSheet.show(
                             context: context,
-                            tabId: widget.tab.id,
+                            tab: widget.tab,
                           ),
                           child: const Text('Add some items now'),
                         ),
@@ -230,32 +231,10 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                                     ),
                                   ),
                                   // Qty stepper
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: cs.surface,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: cs.outline),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const PhosphorIcon(PhosphorIconsRegular.minus, size: 14),
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                                          onPressed: () => _updateQuantity(item.id, item.quantity - 1),
-                                        ),
-                                        Text(
-                                          '${item.quantity}',
-                                          style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                                        ),
-                                        IconButton(
-                                          icon: const PhosphorIcon(PhosphorIconsRegular.plus, size: 14),
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                                          onPressed: () => _updateQuantity(item.id, item.quantity + 1),
-                                        ),
-                                      ],
-                                    ),
+                                  QtyStepper(
+                                    quantity: item.quantity,
+                                    minQuantity: 0,
+                                    onChanged: (newQty) => _updateQuantity(item.id, newQty),
                                   ),
                                   const SizedBox(width: 16),
                                   Text(

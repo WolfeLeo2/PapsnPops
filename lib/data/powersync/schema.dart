@@ -125,8 +125,7 @@ const schema = Schema([
   Table('staff', [
     Column.text('branch_id'),
     Column.text('name'),
-    Column.text('role'),
-    Column.text('phone'),
+    Column.text('role_label'),
     Column.integer('is_active'),
     Column.text('created_at'),
   ]),

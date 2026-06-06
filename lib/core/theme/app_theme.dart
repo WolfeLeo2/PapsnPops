@@ -57,7 +57,7 @@ class AppTheme {
         border: InputBorder.none,
         enabledBorder: const OutlineInputBorder(
           borderRadius: AppColors.roundedCard,
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: BorderSide(color: AppColors.borderSubtleDark),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: AppColors.roundedCard,
@@ -154,7 +154,7 @@ class AppTheme {
         border: InputBorder.none,
         enabledBorder: const OutlineInputBorder(
           borderRadius: AppColors.roundedCard,
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: BorderSide(color: AppColors.borderSubtleLight),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: AppColors.roundedCard,

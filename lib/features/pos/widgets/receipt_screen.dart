@@ -146,12 +146,23 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
       backgroundColor: cs.surfaceContainerLow,
       appBar: AppBar(
         title: const Text('Checkout Success'),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           IconButton(
-            onPressed: () => context.go('/pos'),
-            icon: const PhosphorIcon(PhosphorIconsRegular.house, size: 24),
+            icon: const PhosphorIcon(PhosphorIconsRegular.printer),
+            tooltip: 'Print Receipt',
+            onPressed: _handlePrint,
           ),
+          IconButton(
+            icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork),
+            tooltip: 'Share PDF',
+            onPressed: _handleShare,
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: _isLoadingMetadata
@@ -211,7 +222,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                                 _buildDetailRow(cs, tt, 'Branch', _branchName ?? ''),
                                 _buildDetailRow(cs, tt, 'Cashier', _cashierName ?? ''),
                                 if (_staffName != null)
-                                  _buildDetailRow(cs, tt, 'Salesperson', _staffName!),
+                                  _buildDetailRow(cs, tt, 'Served By', _staffName!),
                                 if (_customer != null)
                                   _buildDetailRow(cs, tt, 'Customer', _customer!.name),
                                 if (widget.invoice != null) ...[
@@ -310,55 +321,30 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                 ),
 
                 // Sticky Action Bar
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cs.surface,
-                    border: Border(top: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.3))),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _handleShare,
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(0, 56),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: cs.surface,
+                      border: Border(top: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.3))),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(0, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
+                            child: const Text('New Sale'),
                           ),
-                          icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 20),
-                          label: const Text('Share PDF'),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _handlePrint,
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(0, 56),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          icon: const PhosphorIcon(PhosphorIconsRegular.printer, size: 20),
-                          label: const Text('Print Receipt'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: () => context.go('/pos'),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, 56),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: const Text('New Sale'),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -458,7 +444,7 @@ Future<Uint8List> generateReceiptPdf({
               pw.Text('Invoice #: ${invoice.invoiceNumber}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 7)),
             pw.Text('Cashier: ${cashierName ?? 'Staff'}', style: const pw.TextStyle(fontSize: 7)),
             if (staffName != null)
-              pw.Text('Salesperson: $staffName', style: const pw.TextStyle(fontSize: 7)),
+              pw.Text('Served By: $staffName', style: const pw.TextStyle(fontSize: 7)),
             if (customer != null) ...[
               pw.Text('Customer: ${customer.name}', style: const pw.TextStyle(fontSize: 7)),
               if (customer.companyName != null)

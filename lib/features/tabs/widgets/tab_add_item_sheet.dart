@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../domain/models/product_with_variants.dart';
 import '../../../domain/models/product_variant.dart';
 import '../../../domain/models/tab_item.dart';
+import '../../../domain/models/open_tab.dart';
 import '../../../core/utils/currency.dart';
 import '../../../core/utils/stock_display.dart';
 import '../../../shared/widgets/shimmer_skeletons.dart';
@@ -17,16 +18,16 @@ import '../../pos/pos_provider.dart' show activeStaffProvider;
 import '../../pos/widgets/variant_selection_sheet.dart';
 
 class TabAddItemSheet extends ConsumerStatefulWidget {
-  final String tabId;
+  final OpenTab tab;
 
   const TabAddItemSheet({
     super.key,
-    required this.tabId,
+    required this.tab,
   });
 
   static Future<void> show({
     required BuildContext context,
-    required String tabId,
+    required OpenTab tab,
   }) async {
     final isDesktop = MediaQuery.of(context).size.width >= 600;
 
@@ -40,7 +41,7 @@ class TabAddItemSheet extends ConsumerStatefulWidget {
           child: SizedBox(
             width: 600,
             height: 650,
-            child: TabAddItemSheet(tabId: tabId),
+            child: TabAddItemSheet(tab: tab),
           ),
         ),
       );
@@ -56,7 +57,7 @@ class TabAddItemSheet extends ConsumerStatefulWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SafeArea(
-            child: TabAddItemSheet(tabId: tabId),
+            child: TabAddItemSheet(tab: tab),
           ),
         ),
       );
@@ -70,7 +71,7 @@ class TabAddItemSheet extends ConsumerStatefulWidget {
 class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
   String _searchQuery = '';
   String? _selectedCategoryId;
-  String? _selectedStaffId;
+
   int _quantity = 1;
 
   @override
@@ -141,43 +142,8 @@ class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
               const SizedBox(height: 12),
               
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Staff / Salesperson dropdown
-                  Expanded(
-                    child: staffAsync.when(
-                      data: (staffList) {
-                        return DropdownButtonFormField<String>(
-                          value: _selectedStaffId,
-                          hint: const Text('Served By (Optional)'),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: cs.surfaceContainer,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                          items: staffList.map((s) {
-                            return DropdownMenuItem<String>(
-                              value: s['id'] as String,
-                              child: Text(s['name'] as String),
-                            );
-                          }).toList(),
-                          onChanged: (val) => setState(() => _selectedStaffId = val),
-                        );
-                      },
-                      loading: () => Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: cs.surfaceContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      error: (_, __) => const SizedBox(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   // Qty picker
                   Container(
                     height: 48,
@@ -429,13 +395,13 @@ class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
 
     final item = TabItem(
       id: generateV4Uuid(),
-      tabId: widget.tabId,
+      tabId: widget.tab.id,
       productId: pwv.product.id,
       variantId: variant.id,
       variantName: variant.name,
       quantity: _quantity,
       unitPrice: variant.sellingPrice,
-      addedBy: _selectedStaffId,
+      addedBy: widget.tab.openedBy,
       createdAt: DateTime.now(),
     );
 
