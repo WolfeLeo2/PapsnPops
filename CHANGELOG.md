@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.1...v1.0.2) (2026-06-06)
+
+
+### Bug Fixes
+
+* github actions pipeline config ([56cfc5b](https://github.com/WolfeLeo2/PapsnPops/commit/56cfc5bb37ba5b1c7afb4bdbe8d7c8177fbb12e5))
+
 ## [1.0.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.0...v1.0.1) (2026-06-06)
 
 
