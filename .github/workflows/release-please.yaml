@@ -95,7 +95,7 @@ jobs:
       - name: Build Windows Release
         run: flutter build windows --release
       - name: Compile Inno Setup Script
-        uses: dsaltares/inno-setup-action@master
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
           path: windows/inno_setup.iss
       - name: Upload to Release
