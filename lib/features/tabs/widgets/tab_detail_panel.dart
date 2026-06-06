@@ -255,7 +255,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, __) => Center(
+              error: (err, _) => Center(
                 child: Text('Error: $err', style: tt.bodyLarge?.copyWith(color: cs.error)),
               ),
             ),
@@ -285,7 +285,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                         ),
                       ),
                       loading: () => Text('...', style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-                      error: (_, __) => Text('KES 0', style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      error: (_, _) => Text('KES 0', style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -457,7 +457,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                 staffAsync.when(
                   data: (staffList) {
                     return DropdownButtonFormField<String>(
-                      value: staffId,
+                      initialValue: staffId,
                       hint: const Text('Salesperson'),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -473,7 +473,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                     );
                   },
                   loading: () => const SizedBox(),
-                  error: (_, __) => const SizedBox(),
+                  error: (_, _) => const SizedBox(),
                 ),
               ],
             ),

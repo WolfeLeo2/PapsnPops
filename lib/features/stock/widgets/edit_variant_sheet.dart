@@ -44,9 +44,7 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
       text: (widget.variant.sellingPrice / 100).toStringAsFixed(2),
     );
     _costPriceController = TextEditingController(
-      text: widget.variant.costPrice != null
-          ? (widget.variant.costPrice! / 100).toStringAsFixed(2)
-          : '',
+      text: (widget.variant.costPrice / 100).toStringAsFixed(2),
     );
     _barcodeController = TextEditingController(
       text: widget.variant.barcode ?? '',

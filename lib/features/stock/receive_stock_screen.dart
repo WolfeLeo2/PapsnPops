@@ -210,10 +210,11 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
         });
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -417,7 +418,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
                         );
                       }
                       return DropdownButtonFormField<String>(
-                        value: _selectedReasonId,
+                        initialValue: _selectedReasonId,
                         decoration: const InputDecoration(
                           labelText: 'Reason',
                           border: OutlineInputBorder(),
@@ -556,7 +557,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: state.selectedVariantId,
+                  initialValue: state.selectedVariantId,
                   decoration: const InputDecoration(
                     labelText: 'Received as',
                     border: OutlineInputBorder(),

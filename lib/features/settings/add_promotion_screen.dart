@@ -164,7 +164,7 @@ class _AddPromotionScreenState extends ConsumerState<AddPromotionScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: _type,
+                    initialValue: _type,
                     decoration: const InputDecoration(
                       labelText: 'Discount Type',
                       border: OutlineInputBorder(),
@@ -193,7 +193,7 @@ class _AddPromotionScreenState extends ConsumerState<AddPromotionScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: _targetType,
+                    initialValue: _targetType,
                     decoration: const InputDecoration(
                       labelText: 'Target Type',
                       border: OutlineInputBorder(),

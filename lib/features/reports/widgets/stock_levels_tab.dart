@@ -28,15 +28,16 @@ class _StockLevelsTabState extends ConsumerState<StockLevelsTab> {
         int outCount = 0;
 
         for (final row in rows) {
-          if (row.quantity <= 0)
+          if (row.quantity <= 0) {
             outCount++;
-          else if (row.quantity <= row.reorderLevel)
+          } else if (row.quantity <= row.reorderLevel)
             lowCount++;
         }
 
         final filteredRows = rows.where((row) {
-          if (_filter == 'Low')
+          if (_filter == 'Low') {
             return row.quantity > 0 && row.quantity <= row.reorderLevel;
+          }
           if (_filter == 'Out') return row.quantity <= 0;
           return true;
         }).toList();
@@ -123,7 +124,7 @@ class _StockLevelsTabState extends ConsumerState<StockLevelsTab> {
                                     value: percent,
                                     color: statusColor,
                                     backgroundColor: cs.outlineVariant
-                                        .withOpacity(0.5),
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 const SizedBox(width: 8),

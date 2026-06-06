@@ -5,7 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'stock_provider.dart';
 import 'widgets/product_card.dart';
 import 'add_product_screen.dart';
-import '../pos/widgets/variant_selection_sheet.dart';
 import '../../shared/widgets/empty_state.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {

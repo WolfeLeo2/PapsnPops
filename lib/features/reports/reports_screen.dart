@@ -159,7 +159,7 @@ class ReportsScreen extends ConsumerWidget {
                             vertical: 8,
                           ),
                           itemCount: ReportTab.values.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          separatorBuilder: (_, _) => const SizedBox(width: 8),
                           itemBuilder: (context, i) {
                             final tab = ReportTab.values[i];
                             return ChoiceChip(
@@ -282,8 +282,9 @@ class DateFilterChips extends ConsumerWidget {
       label: Text(label),
       selected: current == value,
       onSelected: (selected) {
-        if (selected)
+        if (selected) {
           ref.read(selectedReportPeriodProvider.notifier).set(value);
+        }
       },
     );
   }

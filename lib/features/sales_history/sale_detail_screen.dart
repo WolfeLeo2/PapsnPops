@@ -357,7 +357,7 @@ class SaleDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, __) => Center(
+        error: (err, _) => Center(
           child: Text('Error: $err', style: tt.bodyLarge?.copyWith(color: cs.error)),
         ),
       ),
@@ -458,7 +458,7 @@ class SaleDetailScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _buildDetailRow('Invoice Number', invoice.invoiceNumber ?? 'N/A', cs, tt),
+          _buildDetailRow('Invoice Number', invoice.invoiceNumber, cs, tt),
           const SizedBox(height: 6),
           if (invoice.dueDate != null)
             _buildDetailRow('Due Date', DateFormat('dd MMM yyyy').format(invoice.dueDate!), cs, tt),

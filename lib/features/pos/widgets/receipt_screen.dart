@@ -5,7 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../domain/models/sale.dart';
 import '../../../domain/models/sale_item.dart';
@@ -265,7 +264,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                item.variantName ?? 'Product',
+                                                item.variantName,
                                                 style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                                               ),
                                               if (item.discountAmount > 0)
@@ -475,7 +474,7 @@ Future<Uint8List> generateReceiptPdf({
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text(item.variantName ?? 'Product', style: const pw.TextStyle(fontSize: 7)),
+                          pw.Text(item.variantName, style: const pw.TextStyle(fontSize: 7)),
                           if (item.discountAmount > 0)
                             pw.Text('  Discount: -KES ${(item.discountAmount / 100).toStringAsFixed(0)}', style: const pw.TextStyle(fontSize: 6, color: PdfColors.grey700)),
                         ],

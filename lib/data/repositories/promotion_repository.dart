@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/promotion.dart';
-import 'package:powersync/powersync.dart';
 import '../supabase/supabase_client.dart';
 import '../powersync/powersync_client.dart';
 

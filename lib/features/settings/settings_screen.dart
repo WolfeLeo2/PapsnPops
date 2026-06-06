@@ -5,7 +5,6 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app.dart';
-import '../../shared/widgets/app_scaffold.dart';
 import 'settings_provider.dart';
 
 import 'branch_settings.dart';

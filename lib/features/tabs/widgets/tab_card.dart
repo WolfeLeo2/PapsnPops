@@ -75,7 +75,7 @@ class _TabCardState extends ConsumerState<TabCard> {
           width: widget.isSelected ? 2 : 0,
         ),
       ),
-      color: widget.isSelected ? cs.primaryContainer.withOpacity(0.1) : cs.surfaceContainerHigh,
+      color: widget.isSelected ? cs.primaryContainer.withValues(alpha: 0.1) : cs.surfaceContainerHigh,
       child: InkWell(
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(16),
@@ -160,7 +160,7 @@ class _TabCardState extends ConsumerState<TabCard> {
                       );
                     },
                     loading: () => Text('...', style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
-                    error: (_, __) => Text('Error', style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
+                    error: (_, _) => Text('Error', style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
                   ),
                   totalAsync.when(
                     data: (total) => Text(
@@ -171,7 +171,7 @@ class _TabCardState extends ConsumerState<TabCard> {
                       ),
                     ),
                     loading: () => Text('...', style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    error: (_, __) => Text('---', style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    error: (_, _) => Text('---', style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

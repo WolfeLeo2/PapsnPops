@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:go_router/go_router.dart';
 import '../../shared/widgets/app_scaffold.dart';
 import '../../domain/models/sale.dart';
 import '../../core/utils/currency.dart';
@@ -283,7 +282,7 @@ class SalesHistoryScreen extends ConsumerWidget {
                 }
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, __) => Center(
+              error: (err, _) => Center(
                 child: Text('Error: $err', style: tt.bodyLarge?.copyWith(color: cs.error)),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../../domain/models/product_with_variants.dart';
 import '../../../domain/models/product_variant.dart';
 import '../../../domain/models/tab_item.dart';
@@ -9,10 +8,8 @@ import '../../../domain/models/open_tab.dart';
 import '../../../core/utils/currency.dart';
 import '../../../core/utils/stock_display.dart';
 import '../../../shared/widgets/shimmer_skeletons.dart';
-import '../../../data/repositories/customer_repository.dart';
 import '../../../data/repositories/tab_repository.dart';
 import '../../../data/repositories/product_repository.dart';
-import '../../../data/repositories/branch_provider.dart';
 import '../../stock/stock_provider.dart' show categoriesProvider, productStockProvider, generateV4Uuid;
 import '../../pos/pos_provider.dart' show activeStaffProvider;
 import '../../pos/widgets/variant_selection_sheet.dart';
@@ -225,7 +222,7 @@ class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
             );
           },
           loading: () => const SizedBox(height: 52),
-          error: (_, __) => const SizedBox(),
+          error: (_, _) => const SizedBox(),
         ),
 
         // Product Grid

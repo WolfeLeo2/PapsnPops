@@ -68,9 +68,9 @@ class ReconciliationTab extends ConsumerWidget {
                         final isNegative = row.discrepancy < 0;
                         final isPositive = row.discrepancy > 0;
                         Color? discrepancyColor;
-                        if (isNegative)
+                        if (isNegative) {
                           discrepancyColor = cs.error;
-                        else if (isPositive)
+                        } else if (isPositive)
                           discrepancyColor = Colors.orange;
 
                         return DataRow(

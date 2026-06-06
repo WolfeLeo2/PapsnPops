@@ -4,7 +4,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../shared/widgets/app_scaffold.dart';
 import '../../shared/widgets/empty_state.dart';
-import '../../shared/widgets/stat_card.dart';
 import '../../domain/models/open_tab.dart';
 import '../../domain/models/customer.dart';
 import '../../core/utils/currency.dart';
@@ -93,7 +92,7 @@ class TabsScreen extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(height: 100),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
 
           const SizedBox(height: 16),
@@ -226,7 +225,7 @@ class TabsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              error: (err, __) => Center(
+              error: (err, _) => Center(
                 child: Text('Error: $err', style: tt.bodyLarge?.copyWith(color: cs.error)),
               ),
             ),
@@ -346,7 +345,7 @@ class TabsScreen extends ConsumerWidget {
                     staffAsync.when(
                       data: (staffList) {
                         return DropdownButtonFormField<String>(
-                          value: selectedStaffId,
+                          initialValue: selectedStaffId,
                           hint: const Text('Opened By (Optional)'),
                           decoration: const InputDecoration(
                             labelText: 'Opened By Staff (Optional)',
@@ -370,7 +369,7 @@ class TabsScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      error: (_, __) => const SizedBox(),
+                      error: (_, _) => const SizedBox(),
                     ),
                   ],
                 ),

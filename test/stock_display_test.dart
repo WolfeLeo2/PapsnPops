@@ -56,6 +56,6 @@ void main() {
       ),
     ];
 
-    print('Quantity 2010 -> ' + StockDisplay.format(product, 2010, variants));
+    print('Quantity 2010 -> ${StockDisplay.format(product, 2010, variants)}');
   });
 }

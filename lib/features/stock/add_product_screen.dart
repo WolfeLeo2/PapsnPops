@@ -462,7 +462,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       final categoriesAsync = ref.watch(categoriesProvider);
                       return categoriesAsync.when(
                         data: (categories) => DropdownButtonFormField<String>(
-                          value: _selectedCategoryId,
+                          initialValue: _selectedCategoryId,
                           decoration: InputDecoration(
                             labelText: 'Category',
                             border: OutlineInputBorder(
@@ -485,7 +485,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                               setState(() => _selectedCategoryId = v),
                         ),
                         loading: () => const CircularProgressIndicator(),
-                        error: (_, __) =>
+                        error: (_, _) =>
                             const Text('Error loading categories'),
                       );
                     },
