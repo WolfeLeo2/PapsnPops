@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.0...v1.0.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* fixed github actions ([db32645](https://github.com/WolfeLeo2/PapsnPops/commit/db326450960d9cbae3f330e48d1c8c1e972fb7fa))
+
 ## 1.0.0 (2026-06-06)
 
 
