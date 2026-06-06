@@ -292,7 +292,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    if (ref.watch(authProvider.notifier).state?.userMetadata?['role'] == 'owner')
+                    if (ref.watch(authProvider)?.userMetadata?['role'] == 'owner')
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _voidTab,
@@ -307,7 +307,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                           ),
                         ),
                       ),
-                    if (ref.watch(authProvider.notifier).state?.userMetadata?['role'] == 'owner')
+                    if (ref.watch(authProvider)?.userMetadata?['role'] == 'owner')
                       const SizedBox(width: 12),
                     Expanded(
                       flex: 2,

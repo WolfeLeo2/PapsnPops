@@ -39,10 +39,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authProvider.notifier).signUp(email, password);
-      if (!context.mounted) return;
+      if (!mounted) return;
       context.push('/verify', extra: email);
     } on AuthException catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
@@ -50,7 +50,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         ),
       );
     } catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('An unexpected error occurred. Please try again.'),

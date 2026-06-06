@@ -27,7 +27,7 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen> {
       await ref.read(authProvider.notifier).verifyEmailOTP(widget.email!, otp);
       // On success, authState updates and router redirects to /onboarding automatically
     } on AuthException catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
@@ -35,7 +35,7 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen> {
         ),
       );
     } catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
@@ -186,14 +186,14 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen> {
                                 await ref
                                     .read(authProvider.notifier)
                                     .resendSignupOTP(widget.email!);
-                                if (!context.mounted) return;
+                                if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('OTP resent successfully'),
                                   ),
                                 );
                               } on AuthException catch (e) {
-                                if (!context.mounted) return;
+                                if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(e.message),
@@ -203,7 +203,7 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen> {
                                   ),
                                 );
                               } catch (e) {
-                                if (!context.mounted) return;
+                                if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(e.toString()),
