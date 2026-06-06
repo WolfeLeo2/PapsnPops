@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.2...v1.0.3) (2026-06-06)
+
+
+### Bug Fixes
+
+* updated inno setup for actions ([358d9d9](https://github.com/WolfeLeo2/PapsnPops/commit/358d9d903f0af36b06d935021166ff791a448c17))
+
 ## [1.0.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.1...v1.0.2) (2026-06-06)
 
 
