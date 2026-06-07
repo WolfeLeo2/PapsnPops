@@ -162,7 +162,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final List<VolumeServingState> _volumeServings = [];
 
   // Step 4: Alerts
-  final _reorderCtrl = TextEditingController(text: '10');
+  final _reorderCtrl = TextEditingController(text: '5');
 
   @override
   void initState() {

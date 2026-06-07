@@ -435,7 +435,7 @@ Stream<List<StockLevelReportRow>> stockLevelsReport(Ref ref) {
             name: row['name'] as String,
             category: row['category'] as String? ?? 'Uncategorized',
             quantity: row['quantity'] as int? ?? 0,
-            reorderLevel: row['reorder_level'] as int? ?? 10,
+            reorderLevel: row['reorder_level'] as int? ?? 5,
             lastReceivedAt: row['last_received_at'] != null
                 ? DateTime.tryParse(
                     row['last_received_at'] as String,

@@ -280,7 +280,7 @@ Stream<List<StockLevelItem>> stockLevels(Ref ref) {
             name: row['name'] as String,
             category: row['category'] as String? ?? 'Uncategorized',
             quantity: row['quantity'] as int? ?? 0,
-            reorderLevel: row['reorder_level'] as int? ?? 10,
+            reorderLevel: row['reorder_level'] as int? ?? 5,
           );
         }).toList();
       });
@@ -341,7 +341,7 @@ Stream<List<LowStockAlertItem>> lowStockAlerts(Ref ref) {
             productId: row['product_id'] as String,
             name: row['name'] as String,
             quantity: row['quantity'] as int? ?? 0,
-            reorderLevel: row['reorder_level'] as int? ?? 10,
+            reorderLevel: row['reorder_level'] as int? ?? 5,
           );
         }).toList();
       });
