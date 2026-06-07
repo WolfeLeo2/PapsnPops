@@ -25,8 +25,8 @@ class UpdateService {
         final packageInfo = await PackageInfo.fromPlatform();
         final currentVersion = packageInfo.version;
 
-        // Mock test comparison as requested (e.g. comparing against v0.0.1)
-        final bool isMockTesting = true;
+        // Set to true only when testing UI, otherwise false
+        final bool isMockTesting = false;
         
         // Simple version check (assumes semantic versioning like 1.0.4)
         if (isMockTesting || _isNewerVersion(latestVersion, currentVersion)) {
@@ -39,7 +39,7 @@ class UpdateService {
           if (installerAsset != null) {
             final downloadUrl = installerAsset['browser_download_url'] as String;
             if (context.mounted) {
-              _showUpdateAvailableDialog(context, latestVersion, downloadUrl);
+              _showUpdateBanner(context, latestVersion, downloadUrl);
             }
           }
         }
@@ -66,17 +66,18 @@ class UpdateService {
     }
   }
 
-  void _showUpdateAvailableDialog(BuildContext context, String version, String downloadUrl) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return _UpdateDialog(
+  void _showUpdateBanner(BuildContext context, String version, String downloadUrl) {
+    ScaffoldMessenger.of(context).showMaterialBanner(
+      MaterialBanner(
+        content: _UpdateBannerContent(
           version: version,
           downloadUrl: downloadUrl,
           updateService: this,
-        );
-      },
+        ),
+        actions: const [SizedBox.shrink()], // Actions handled inside the content to allow state changes
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+        elevation: 2,
+      ),
     );
   }
 
@@ -105,22 +106,22 @@ class UpdateService {
   }
 }
 
-class _UpdateDialog extends StatefulWidget {
+class _UpdateBannerContent extends StatefulWidget {
   final String version;
   final String downloadUrl;
   final UpdateService updateService;
 
-  const _UpdateDialog({
+  const _UpdateBannerContent({
     required this.version,
     required this.downloadUrl,
     required this.updateService,
   });
 
   @override
-  State<_UpdateDialog> createState() => _UpdateDialogState();
+  State<_UpdateBannerContent> createState() => _UpdateBannerContentState();
 }
 
-class _UpdateDialogState extends State<_UpdateDialog> {
+class _UpdateBannerContentState extends State<_UpdateBannerContent> {
   bool _isDownloading = false;
   double _progress = 0.0;
   String? _error;
@@ -152,41 +153,54 @@ class _UpdateDialogState extends State<_UpdateDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    return AlertDialog(
-      title: Text('Update Available'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                _error!,
-                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
-              ),
+    final cs = theme.colorScheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              _error!,
+              style: theme.textTheme.bodyMedium?.copyWith(color: cs.error),
             ),
-          if (!_isDownloading)
-            Text('Version ${widget.version} is available! Update now?'),
-          if (_isDownloading) ...[
-            Text('Downloading update... ${( _progress * 100).toStringAsFixed(1)}%'),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(value: _progress),
-          ],
+          ),
+        if (!_isDownloading)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'Version ${widget.version} is available! Update now?',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+              TextButton(
+                onPressed: () => ScaffoldMessenger.of(context).clearMaterialBanners(),
+                child: const Text('Later'),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: _startUpdate,
+                child: const Text('Update Now'),
+              ),
+            ],
+          ),
+        if (_isDownloading) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Downloading update... ${(_progress * 100).toStringAsFixed(1)}%',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(value: _progress),
         ],
-      ),
-      actions: [
-        if (!_isDownloading)
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Later'),
-          ),
-        if (!_isDownloading)
-          FilledButton(
-            onPressed: _startUpdate,
-            child: const Text('Update Now'),
-          ),
       ],
     );
   }
