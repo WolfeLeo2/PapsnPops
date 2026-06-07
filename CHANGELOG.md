@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.2...v1.4.0) (2026-06-07)
+
+
+### Features
+
+* implement auto updater and tweak variant decommission UI ([a59abf3](https://github.com/WolfeLeo2/PapsnPops/commit/a59abf33be721aa9c61a81810453f53a1a798850))
+
 ## [1.3.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.1...v1.3.2) (2026-06-07)
 
 
