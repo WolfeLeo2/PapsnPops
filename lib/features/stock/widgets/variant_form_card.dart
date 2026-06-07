@@ -153,7 +153,7 @@ class _PieceVariantCardState extends State<PieceVariantCard>
                 Expanded(
                   child: _PriceField(
                     controller: widget.state.costPriceCtrl,
-                    label: 'Cost price',
+                    label: 'Buying price',
                     validator: (v) => _validatePrice(v),
                   ),
                 ),
@@ -504,7 +504,7 @@ class _VolumeContainerCardState extends State<VolumeContainerCard>
                 Expanded(
                   child: _PriceField(
                     controller: widget.state.costPriceCtrl,
-                    label: 'Cost price',
+                    label: 'Buying price',
                     validator: (v) {
                       final n = int.tryParse(v?.replaceAll(',', '') ?? '');
                       if (n == null || n < 1) return 'Required';

@@ -196,7 +196,7 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
             TextFormField(
               controller: _costPriceController,
               decoration: const InputDecoration(
-                labelText: 'Cost Price (KES)',
+                labelText: 'Buying Price (KES)',
                 border: OutlineInputBorder(),
               ),
               keyboardType: const TextInputType.numberWithOptions(

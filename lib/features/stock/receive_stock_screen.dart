@@ -586,7 +586,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
-              labelText: 'Cost Price per unit (KES)',
+              labelText: 'Buying Price per unit (KES)',
               border: OutlineInputBorder(),
             ),
           ),
@@ -630,7 +630,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: InputDecoration(
-              labelText: 'Cost Price per $containerName (KES)',
+              labelText: 'Buying Price per $containerName (KES)',
               border: const OutlineInputBorder(),
             ),
           ),
