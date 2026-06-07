@@ -28,8 +28,16 @@ class NotificationService {
 
   Future<void> _init() async {
     // 1. Initialize Local Notifications for foreground messages
-    const androidInitSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidInitSettings);
+    const androidInitSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
+    const iosInitSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+    const initSettings = InitializationSettings(
+      android: androidInitSettings,
+      iOS: iosInitSettings,
+    );
     await _localNotificationsPlugin.initialize(settings: initSettings);
 
     // 2. Request permissions
@@ -104,7 +112,16 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     await _localNotificationsPlugin.show(
       id: notification.hashCode,
