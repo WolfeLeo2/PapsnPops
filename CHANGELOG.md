@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.1.0...v1.2.0) (2026-06-07)
+
+
+### Features
+
+* add 'add new category' option in product form ([c280a1d](https://github.com/WolfeLeo2/PapsnPops/commit/c280a1d12c66f120ccea6645618cc4c1d1ef4678))
+* add stock validation when adding items to cart and tabs ([e83eb8b](https://github.com/WolfeLeo2/PapsnPops/commit/e83eb8b0aaf259d0f08abcc538ce34dc0f50b4cc))
+
+
+### Bug Fixes
+
+* foreground local notifications on iOS and update Android icon reference ([c3aa6f7](https://github.com/WolfeLeo2/PapsnPops/commit/c3aa6f79069143d5be00e5407c0e26d20a0a9809))
+* resolve flutter analyze errors and warnings for CI ([8ee2527](https://github.com/WolfeLeo2/PapsnPops/commit/8ee2527d4595cc9128973607179836f9e555828f))
+
 ## [1.1.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.3...v1.1.0) (2026-06-07)
 
 
