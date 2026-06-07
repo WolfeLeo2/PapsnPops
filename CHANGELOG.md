@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.1...v1.3.2) (2026-06-07)
+
+
+### Bug Fixes
+
+* add missing app_config.dart that was untracked ([f6bf4ba](https://github.com/WolfeLeo2/PapsnPops/commit/f6bf4ba62277541756dec32473aad80ca6c5fdb8))
+* replace dotenv with dart-define for Windows compatibility ([6feb8d5](https://github.com/WolfeLeo2/PapsnPops/commit/6feb8d59bd8c0952df6ffa9171af27c9e58fb5a6))
+
 ## [1.3.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.0...v1.3.1) (2026-06-07)
 
 
