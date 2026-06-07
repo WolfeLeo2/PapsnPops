@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,6 +15,8 @@ void main() async {
   await initializeSupabase();
   await initializePowerSync();
   await Firebase.initializeApp();
-  setupFirebaseBackgroundHandler();
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
+    setupFirebaseBackgroundHandler();
+  }
   runApp(const ProviderScope(child: PapsnPopsApp()));
 }
