@@ -56,8 +56,6 @@ class ProductDetailScreen extends ConsumerWidget {
 
           final stockLevel = ref.watch(productStockProvider(productId));
           final quantity = stockLevel?.quantity ?? 0;
-          final isLowStock =
-              quantity <= (product.reorderLevel > 0 ? product.reorderLevel : 5);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -247,7 +245,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    'Cost: ${CurrencyHelper.format(variant.costPrice ?? 0)}',
+                                    'Cost: ${CurrencyHelper.format(variant.costPrice)}',
                                     style: tt.bodySmall?.copyWith(
                                       color: cs.onSurfaceVariant,
                                     ),

@@ -11,7 +11,6 @@ import '../../../shared/widgets/shimmer_skeletons.dart';
 import '../../../data/repositories/tab_repository.dart';
 import '../../../data/repositories/product_repository.dart';
 import '../../stock/stock_provider.dart' show categoriesProvider, productStockProvider, generateV4Uuid;
-import '../../pos/pos_provider.dart' show activeStaffProvider;
 import '../../pos/widgets/variant_selection_sheet.dart';
 
 class TabAddItemSheet extends ConsumerStatefulWidget {
@@ -79,7 +78,6 @@ class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
 
     final categoriesAsync = ref.watch(categoriesProvider);
     final productsAsync = ref.watch(productRepositoryProvider).watchAllProducts();
-    final staffAsync = ref.watch(activeStaffProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

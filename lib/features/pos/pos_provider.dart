@@ -10,6 +10,7 @@ import '../../data/repositories/promotion_repository.dart';
 import '../../domain/models/product_with_variants.dart';
 import '../../data/powersync/powersync_client.dart';
 import '../../data/repositories/branch_provider.dart';
+import '../stock/stock_provider.dart';
 
 part 'pos_provider.g.dart';
 

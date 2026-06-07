@@ -397,8 +397,6 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
     String? staffId;
     
     final staffAsync = ref.read(activeStaffProvider);
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
 
     final result = await showDialog<bool>(
       context: context,

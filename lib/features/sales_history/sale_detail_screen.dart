@@ -10,7 +10,6 @@ import '../../../domain/models/customer.dart';
 import '../../../domain/models/invoice.dart';
 import '../../../core/utils/currency.dart';
 import '../../../data/repositories/sale_repository.dart';
-import '../../../data/repositories/invoice_repository.dart';
 import '../auth/auth_provider.dart';
 import '../../../data/powersync/powersync_client.dart';
 import '../pos/widgets/receipt_screen.dart' show generateReceiptPdf;

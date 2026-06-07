@@ -11,7 +11,6 @@ import '../../../data/repositories/branch_provider.dart';
 import '../../../features/auth/auth_provider.dart';
 import '../../../features/stock/stock_provider.dart' show generateV4Uuid;
 import '../pos_provider.dart';
-import '../pos_provider.dart';
 import 'receipt_screen.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
