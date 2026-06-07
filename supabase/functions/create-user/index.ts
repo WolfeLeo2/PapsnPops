@@ -97,7 +97,6 @@ Deno.serve(async (req) => {
     const branchAccessInserts = branch_ids.map((branch_id: string) => ({
       user_id: newUserId,
       branch_id,
-      organisation_id,
     }));
 
     const { error: branchError } = await supabaseAdmin.from("user_branch_access").insert(branchAccessInserts);

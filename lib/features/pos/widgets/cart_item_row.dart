@@ -94,9 +94,14 @@ class CartItemRow extends ConsumerWidget {
               QtyStepper(
                 quantity: item.quantity,
                 onChanged: (newQty) {
-                  ref
+                  final success = ref
                       .read(cartProvider.notifier)
                       .updateQuantity(item.variant.id, newQty);
+                  if (!success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Insufficient stock to increase quantity')),
+                    );
+                  }
                 },
               ),
               const SizedBox(width: 16),

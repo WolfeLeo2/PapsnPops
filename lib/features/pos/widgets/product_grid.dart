@@ -234,13 +234,23 @@ class ProductCard extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           if (!hasVariants || productWithVariants.variants.length == 1) {
-            ref.read(cartProvider.notifier).addToCart(product, defaultVariant, 1);
+            final success = ref.read(cartProvider.notifier).addToCart(product, defaultVariant, 1);
+            if (!success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Insufficient stock for this item')),
+              );
+            }
           } else {
             VariantSelectionSheet.show(
               context: context,
               productWithVariants: productWithVariants,
               onVariantSelected: (variant) {
-                ref.read(cartProvider.notifier).addToCart(product, variant, 1);
+                final success = ref.read(cartProvider.notifier).addToCart(product, variant, 1);
+                if (!success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Insufficient stock for this item')),
+                  );
+                }
               },
             );
           }

@@ -78,7 +78,22 @@ class Cart extends _$Cart {
     state = _recalculate(activePromotions);
   }
 
-  void addToCart(Product product, ProductVariant variant, int qty) {
+  bool addToCart(Product product, ProductVariant variant, int qty) {
+    final stockLevel = ref.read(productStockProvider(product.id));
+    final currentStock = stockLevel?.quantity ?? 0;
+    
+    final addedBaseUnits = qty * variant.conversionFactor;
+    int existingBaseUnits = 0;
+    for (final item in _rawItems) {
+      if (item.product.id == product.id) {
+        existingBaseUnits += item.quantity * item.variant.conversionFactor;
+      }
+    }
+    
+    if (existingBaseUnits + addedBaseUnits > currentStock) {
+      return false; // Insufficient stock
+    }
+
     final index = _rawItems.indexWhere((item) => item.variant.id == variant.id);
     if (index >= 0) {
       final existing = _rawItems[index];
@@ -97,6 +112,7 @@ class Cart extends _$Cart {
       );
     }
     _updateState();
+    return true;
   }
 
   void removeFromCart(String variantId) {
@@ -104,19 +120,39 @@ class Cart extends _$Cart {
     _updateState();
   }
 
-  void updateQuantity(String variantId, int newQty) {
+  bool updateQuantity(String variantId, int newQty) {
     if (newQty <= 0) {
       removeFromCart(variantId);
-      return;
+      return true;
     }
     final index = _rawItems.indexWhere((item) => item.variant.id == variantId);
     if (index >= 0) {
+      final existingItem = _rawItems[index];
+      if (newQty > existingItem.quantity) {
+        final diff = newQty - existingItem.quantity;
+        final stockLevel = ref.read(productStockProvider(existingItem.product.id));
+        final currentStock = stockLevel?.quantity ?? 0;
+        
+        final addedBaseUnits = diff * existingItem.variant.conversionFactor;
+        int existingBaseUnits = 0;
+        for (final item in _rawItems) {
+          if (item.product.id == existingItem.product.id) {
+            existingBaseUnits += item.quantity * item.variant.conversionFactor;
+          }
+        }
+        
+        if (existingBaseUnits + addedBaseUnits > currentStock) {
+          return false; // Insufficient stock
+        }
+      }
+
       _rawItems[index] = _rawItems[index].copyWith(
         quantity: newQty,
         discountAmount: 0,
       );
       _updateState();
     }
+    return true;
   }
 
   void clear() {

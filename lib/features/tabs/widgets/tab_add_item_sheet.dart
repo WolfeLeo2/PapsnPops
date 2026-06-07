@@ -390,6 +390,21 @@ class _TabAddItemSheetState extends ConsumerState<TabAddItemSheet> {
     final repo = ref.read(tabRepositoryProvider);
     final errorColor = Theme.of(context).colorScheme.error;
 
+    // Check stock
+    final stockLevel = ref.read(productStockProvider(pwv.product.id));
+    final currentStock = stockLevel?.quantity ?? 0;
+    final addedBaseUnits = _quantity * variant.conversionFactor;
+
+    if (addedBaseUnits > currentStock) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: const Text('Insufficient stock for this item'),
+          backgroundColor: errorColor,
+        ),
+      );
+      return;
+    }
+
     final item = TabItem(
       id: generateV4Uuid(),
       tabId: widget.tab.id,
