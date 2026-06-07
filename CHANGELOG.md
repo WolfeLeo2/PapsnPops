@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.4.0...v1.5.0) (2026-06-07)
+
+
+### Features
+
+* change default reorder level from 10 to 5 ([1c036d3](https://github.com/WolfeLeo2/PapsnPops/commit/1c036d3b290c4114628eeb4ced0d7d3387b61267))
+
 ## [1.4.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.2...v1.4.0) (2026-06-07)
 
 
