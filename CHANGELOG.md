@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.3...v1.1.0) (2026-06-07)
+
+
+### Features
+
+* setup app icon, name, and enforce payment references ([a7e6d45](https://github.com/WolfeLeo2/PapsnPops/commit/a7e6d452247f8cadbd306bac2cc9eca98467f8c5))
+
+
+### Bug Fixes
+
+* resolve failing tests and CI analyze errors ([7b3c5df](https://github.com/WolfeLeo2/PapsnPops/commit/7b3c5df500e0cab8691ec85fa667c5b7381c69cb))
+
 ## [1.0.3](https://github.com/WolfeLeo2/PapsnPops/compare/v1.0.2...v1.0.3) (2026-06-06)
 
 
