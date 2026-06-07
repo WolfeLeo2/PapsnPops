@@ -90,6 +90,7 @@ class Auth extends _$Auth {
   }
 
   Future<void> logout() async {
+    await disconnectPowerSync();
     await supabase.auth.signOut();
   }
 }

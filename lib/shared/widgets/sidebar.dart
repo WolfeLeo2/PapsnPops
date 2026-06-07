@@ -367,11 +367,31 @@ class Sidebar extends ConsumerWidget {
                               ],
                             ),
                           ),
+                          IconButton(
+                            icon: const PhosphorIcon(PhosphorIconsRegular.signOut),
+                            color: cs.error,
+                            onPressed: () {
+                              ref.read(authProvider.notifier).logout();
+                            },
+                            tooltip: 'Logout',
+                          ),
                         ],
                       ),
                     )
-                  : Tooltip(
-                      message: '$fullName ($roleName)',
+                  : PopupMenuButton<String>(
+                      tooltip: '$fullName ($roleName)',
+                      offset: const Offset(50, 0),
+                      onSelected: (val) {
+                        if (val == 'logout') {
+                          ref.read(authProvider.notifier).logout();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'logout',
+                          child: Text('Logout'),
+                        ),
+                      ],
                       child: Center(
                         child: CircleAvatar(
                           radius: 18,
