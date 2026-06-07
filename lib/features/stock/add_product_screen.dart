@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'stock_provider.dart';
 import 'widgets/variant_form_card.dart';
+import 'widgets/add_category_dialog.dart';
 import '../../features/auth/auth_provider.dart';
 
 enum MeasurementType { piece, volume }
@@ -462,7 +463,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       final categoriesAsync = ref.watch(categoriesProvider);
                       return categoriesAsync.when(
                         data: (categories) => DropdownButtonFormField<String>(
-                          initialValue: _selectedCategoryId,
+                          value: () {
+                            if (_selectedCategoryId == null) return null;
+                            if (categories.any((c) => c.id == _selectedCategoryId)) return _selectedCategoryId;
+                            return null; // fallback if category is not yet in the list
+                          }(),
                           decoration: InputDecoration(
                             labelText: 'Category',
                             border: OutlineInputBorder(
@@ -480,9 +485,27 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 child: Text(c.name),
                               ),
                             ),
+                            const DropdownMenuItem(
+                              value: '_add_new_',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.add, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Add new category', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
                           ],
-                          onChanged: (v) =>
-                              setState(() => _selectedCategoryId = v),
+                          onChanged: (v) async {
+                            if (v == '_add_new_') {
+                              final newId = await AddCategoryDialog.show(context);
+                              if (newId != null) {
+                                setState(() => _selectedCategoryId = newId);
+                              }
+                            } else {
+                              setState(() => _selectedCategoryId = v);
+                            }
+                          },
                         ),
                         loading: () => const CircularProgressIndicator(),
                         error: (_, _) =>
