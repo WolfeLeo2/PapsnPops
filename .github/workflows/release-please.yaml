@@ -28,16 +28,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create .env file
-        shell: bash
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: |
-          if [ -n "$ENV_FILE" ]; then
-            echo "$ENV_FILE" > .env
-          else
-            echo "Warning: ENV_FILE secret not provided"
-          fi
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
@@ -61,7 +51,15 @@ jobs:
             echo "storeFile=upload-keystore.jks" >> android/key.properties
           fi
       - name: Build Android Release
-        run: flutter build apk --release
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          POWERSYNC_URL: ${{ secrets.POWERSYNC_URL }}
+        run: |
+          flutter build apk --release \
+            --dart-define=SUPABASE_URL=$SUPABASE_URL \
+            --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
+            --dart-define=POWERSYNC_URL=$POWERSYNC_URL
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
@@ -75,16 +73,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create .env file
-        shell: bash
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: |
-          if [ -n "$ENV_FILE" ]; then
-            echo "$ENV_FILE" > .env
-          else
-            echo "Warning: ENV_FILE secret not provided"
-          fi
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -93,7 +81,15 @@ jobs:
       - name: Enable Windows Desktop
         run: flutter config --enable-windows-desktop
       - name: Build Windows Release
-        run: flutter build windows --release
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          POWERSYNC_URL: ${{ secrets.POWERSYNC_URL }}
+        run: |
+          flutter build windows --release `
+            --dart-define=SUPABASE_URL=$env:SUPABASE_URL `
+            --dart-define=SUPABASE_ANON_KEY=$env:SUPABASE_ANON_KEY `
+            --dart-define=POWERSYNC_URL=$env:POWERSYNC_URL
       - name: Compile Inno Setup Script
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:

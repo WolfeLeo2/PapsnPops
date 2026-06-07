@@ -3,9 +3,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'schema.dart';
 import '../supabase/supabase_client.dart';
+import '../../core/config/app_config.dart';
 
 late PowerSyncDatabase db;
 
@@ -16,7 +16,7 @@ class SupabaseConnector extends PowerSyncBackendConnector {
     if (session == null) return null;
 
     return PowerSyncCredentials(
-      endpoint: dotenv.env['POWERSYNC_URL']!,
+      endpoint: AppConfig.powerSyncUrl,
       token: session.accessToken,
     );
   }

@@ -48,7 +48,7 @@ dependencies:
   google_fonts: ^8.1.0
   fl_chart: ^1.2.0
   shared_preferences: ^2.5.5
-  flutter_dotenv: ^6.0.1
+
   path_provider: ^2.1.5
   path: ^1.9.1
   pinput: ^6.0.2
@@ -95,7 +95,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - .env
     - assets/illustrations/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
