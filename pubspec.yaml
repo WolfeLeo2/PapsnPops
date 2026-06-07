@@ -57,6 +57,10 @@ dependencies:
   shimmer: ^3.0.0
   m3e_card_list: ^0.1.0
   settings_ui: ^3.0.1
+  firebase_core: ^4.10.0
+  firebase_messaging: ^16.3.0
+  flutter_local_notifications: ^21.0.0
+  intl_phone_field: ^3.2.0
 
 dependency_overrides:
   phosphor_flutter:
@@ -75,6 +79,8 @@ dev_dependencies:
   riverpod_generator: ^4.0.3
   build_runner: ^2.15.0
   very_good_analysis: ^10.2.0
+  mocktail: ^1.0.5
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -91,6 +97,7 @@ flutter:
   assets:
     - .env
     - assets/illustrations/
+    - assets/icons/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
@@ -119,3 +126,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/liquor_store.png"
+  windows:
+    generate: true
+    image_path: "assets/icon/liquor_store.png"
+    icon_size: 256

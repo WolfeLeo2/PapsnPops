@@ -210,15 +210,16 @@ class Sidebar extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   sectionHeader('MAIN'),
-                  SidebarItem(
-                    label: 'Dashboard',
-                    path: '/dashboard',
-                    regularIcon: PhosphorIconsRegular.chartBar,
-                    fillIcon: PhosphorIconsFill.chartBar,
-                    isExpanded: isExpanded,
-                    currentPath: currentPath,
-                    isMobile: isMobile,
-                  ),
+                  if (isOwner)
+                    SidebarItem(
+                      label: 'Dashboard',
+                      path: '/dashboard',
+                      regularIcon: PhosphorIconsRegular.chartBar,
+                      fillIcon: PhosphorIconsFill.chartBar,
+                      isExpanded: isExpanded,
+                      currentPath: currentPath,
+                      isMobile: isMobile,
+                    ),
                   SidebarItem(
                     label: 'POS',
                     path: '/pos',
@@ -267,6 +268,16 @@ class Sidebar extends ConsumerWidget {
                     currentPath: currentPath,
                     isMobile: isMobile,
                   ),
+                  if (isOwner)
+                    SidebarItem(
+                      label: 'Stock Review',
+                      path: '/stock-review',
+                      regularIcon: PhosphorIconsRegular.clipboardText,
+                      fillIcon: PhosphorIconsFill.clipboardText,
+                      isExpanded: isExpanded,
+                      currentPath: currentPath,
+                      isMobile: isMobile,
+                    ),
 
                   if (isOwner) ...[
                     sectionHeader('REPORTS'),

@@ -50,6 +50,7 @@ class StaffSettings extends ConsumerWidget {
               settingsListBackground: theme.colorScheme.surface,
               settingsSectionBackground: theme.colorScheme.surfaceContainer,
             ),
+            applicationType: ApplicationType.material,
             sections: [
               if (staffList.any((s) => s['is_active'] == 1))
                 SettingsSection(

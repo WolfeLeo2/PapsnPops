@@ -42,7 +42,7 @@ final class SelectedSettingsCategoryProvider
 }
 
 String _$selectedSettingsCategoryHash() =>
-    r'22d8b830288af03172038f80bf40a44a3433a490';
+    r'cec7a993454099656e25a4d538ad30cfd5d1d339';
 
 abstract class _$SelectedSettingsCategory extends $Notifier<SettingsCategory> {
   SettingsCategory build();

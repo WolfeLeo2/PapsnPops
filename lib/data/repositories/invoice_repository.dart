@@ -111,11 +111,52 @@ class InvoiceRepository {
     });
   }
 
-  Future<void> markAsPaid(String invoiceId, DateTime paidAt) async {
-    await db.execute(
-      'UPDATE invoices SET status = ?, paid_at = ? WHERE id = ?',
-      ['paid', paidAt.toIso8601String(), invoiceId],
-    );
+  Future<void> logPayment({
+    required String invoiceId,
+    required String branchId,
+    required int amount,
+    required String paymentMethod,
+    String? paymentReference,
+    required String cashierId,
+  }) async {
+    final now = DateTime.now().toIso8601String();
+    await db.writeTransaction((tx) async {
+      await tx.execute('''
+        INSERT INTO invoice_payments (id, invoice_id, branch_id, amount, payment_method, payment_reference, cashier_id, created_at)
+        VALUES (uuid(), ?, ?, ?, ?, ?, ?, ?)
+      ''', [
+        invoiceId,
+        branchId,
+        amount,
+        paymentMethod,
+        paymentReference,
+        cashierId,
+        now,
+      ]);
+
+      final result = await tx.getOptional('''
+        SELECT SUM(amount) as total_paid
+        FROM invoice_payments
+        WHERE invoice_id = ?
+      ''', [invoiceId]);
+      
+      final totalPaid = (result?['total_paid'] as int?) ?? 0;
+
+      final invoiceRow = await tx.getOptional('''
+        SELECT s.total 
+        FROM invoices i
+        JOIN sales s ON i.sale_id = s.id
+        WHERE i.id = ?
+      ''', [invoiceId]);
+
+      final invoiceTotal = (invoiceRow?['total'] as int?) ?? 0;
+
+      if (totalPaid >= invoiceTotal) {
+        await tx.execute('''
+          UPDATE invoices SET status = 'paid', paid_at = ? WHERE id = ?
+        ''', [now, invoiceId]);
+      }
+    });
   }
 
   Future<String> getNextInvoiceNumber(String branchId) async {

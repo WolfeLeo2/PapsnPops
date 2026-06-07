@@ -31,6 +31,11 @@ class SupabaseConnector extends PowerSyncBackendConnector {
         Map<String, dynamic>? data;
         if (op.opData != null) {
           data = Map<String, dynamic>.from(op.opData!);
+          
+          // Replace any empty strings with null to avoid Postgres UUID parsing errors
+          data.updateAll((key, value) => value == "" ? null : value);
+
+          // Empty lines replaced
           // PowerSync stores JSON arrays as stringified JSON.
           // Postgres array columns (like promotion_ids uuid[]) need them as Lists.
           if (data['promotion_ids'] is String) {

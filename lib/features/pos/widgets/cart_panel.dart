@@ -84,7 +84,7 @@ class _CartPanelState extends ConsumerState<CartPanel> {
         staffId: selectedStaffId,
         customerId: null,
         paymentMethod: paymentMethod,
-        paymentReference: paymentMethod == 'mpesa' ? _refController.text.trim() : null,
+        paymentReference: (paymentMethod == 'mpesa' || paymentMethod == 'card') ? _refController.text.trim() : null,
         subtotal: cartSubtotal,
         discountAmount: cartDiscount,
         total: cartTotal,
@@ -460,14 +460,14 @@ class _CartPanelState extends ConsumerState<CartPanel> {
                 const PaymentMethodSelector(),
                 const SizedBox(height: 12),
 
-                // Reference field if M-Pesa is selected
-                if (paymentMethod == 'mpesa') ...[
+                // Reference field if M-Pesa or Card is selected
+                if (paymentMethod == 'mpesa' || paymentMethod == 'card') ...[
                   TextFormField(
                     controller: _refController,
-                    decoration: const InputDecoration(
-                      labelText: 'M-Pesa Reference Code',
-                      hintText: 'e.g. QX728HJ18A',
-                      border: OutlineInputBorder(
+                    decoration: InputDecoration(
+                      labelText: paymentMethod == 'mpesa' ? 'M-Pesa Reference Code' : 'Card Reference / Receipt No.',
+                      hintText: paymentMethod == 'mpesa' ? 'e.g. QX728HJ18A' : 'e.g. 1234',
+                      border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
                     ),
@@ -476,15 +476,17 @@ class _CartPanelState extends ConsumerState<CartPanel> {
                     },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Reference code is required for M-Pesa';
+                        return paymentMethod == 'mpesa' 
+                            ? 'Reference code is required for M-Pesa'
+                            : 'Reference code is required for Card';
                       }
-                      if (value.trim().length < 5) {
-                        return 'Enter a valid transaction reference';
+                      if (paymentMethod == 'mpesa' && value.trim().length < 5) {
+                        return 'Enter a valid M-Pesa reference';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                 ],
 
                 // Totals Section

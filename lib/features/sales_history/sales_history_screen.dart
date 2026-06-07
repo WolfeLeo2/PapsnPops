@@ -25,6 +25,7 @@ class SalesHistoryScreen extends ConsumerWidget {
     final paymentMethod = ref.watch(salesPaymentMethodProvider);
     final source = ref.watch(salesSourceProvider);
     final dateRange = ref.watch(salesDateRangeProvider);
+    final isUnpaidOnly = ref.watch(salesUnpaidOnlyProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +54,7 @@ class SalesHistoryScreen extends ConsumerWidget {
         children: [
           // Filter Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: cs.outlineVariant)),
             ),
@@ -61,7 +62,9 @@ class SalesHistoryScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Row 1: Search & Date Picker
-                Row(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
                   children: [
                     Expanded(
                       flex: 3,
@@ -124,11 +127,13 @@ class SalesHistoryScreen extends ConsumerWidget {
                     ],
                   ],
                 ),
+              ),
                 const SizedBox(height: 16),
                 
-                // Row 2: Payment Method and Source chips
+                // Row 2: Payment Method chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     children: [
                       Text('Payment:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
@@ -164,7 +169,16 @@ class SalesHistoryScreen extends ConsumerWidget {
                           ref.read(salesPaymentMethodProvider.notifier).set(val ? 'card' : null);
                         },
                       ),
-                      const SizedBox(width: 24),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Row 3: Source chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
                       Text('Source:', style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
                       const SizedBox(width: 8),
                       ChoiceChip(
@@ -196,6 +210,16 @@ class SalesHistoryScreen extends ConsumerWidget {
                         selected: source == 'invoice',
                         onSelected: (val) {
                           ref.read(salesSourceProvider.notifier).set(val ? 'invoice' : null);
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      Container(width: 1, height: 24, color: cs.outlineVariant),
+                      const SizedBox(width: 16),
+                      FilterChip(
+                        label: const Text('Unpaid'),
+                        selected: isUnpaidOnly,
+                        onSelected: (val) {
+                          ref.read(salesUnpaidOnlyProvider.notifier).toggle();
                         },
                       ),
                     ],
@@ -373,77 +397,96 @@ class SalesHistoryScreen extends ConsumerWidget {
               const SizedBox(width: 16),
               // Time and ID
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 16,
+                  runSpacing: 8,
                   children: [
-                    Row(
+                    // Title and Date
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Sale #${sale.id.substring(0, 8).toUpperCase()}',
-                          style: tt.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: cs.onSurface,
-                            decoration: sale.isVoided ? TextDecoration.lineThrough : null,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Source badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: cs.surfaceContainerHigh,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            sale.source.toUpperCase(),
-                            style: tt.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 9,
-                              color: cs.onSurfaceVariant,
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              'Sale #${sale.id.substring(0, 8).toUpperCase()}',
+                              style: tt.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: cs.onSurface,
+                                decoration: sale.isVoided ? TextDecoration.lineThrough : null,
+                              ),
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                            // Source badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: cs.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                sale.source.toUpperCase(),
+                                style: tt.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 9,
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          DateFormat('dd MMM, HH:mm').format(sale.createdAt.toLocal()),
+                          style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      DateFormat('dd MMM, HH:mm').format(sale.createdAt.toLocal()),
-                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    // Total
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          CurrencyHelper.format(sale.total),
+                          style: tt.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: sale.isVoided ? cs.error : cs.primary,
+                            decoration: sale.isVoided ? TextDecoration.lineThrough : null,
+                          ),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (sale.isVoided)
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: cs.errorContainer,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'VOIDED',
+                              style: tt.labelSmall?.copyWith(
+                                color: cs.error,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 9,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              // Total
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    CurrencyHelper.format(sale.total),
-                    style: tt.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: sale.isVoided ? cs.error : cs.primary,
-                      decoration: sale.isVoided ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  if (sale.isVoided)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: cs.errorContainer,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'VOIDED',
-                        style: tt.labelSmall?.copyWith(
-                          color: cs.error,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 9,
-                        ),
-                      ),
-                    ),
-                ],
               ),
             ],
           ),

@@ -79,7 +79,7 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
           .updateVariant(
             variantId: widget.variant.id,
             sellingPrice: selling,
-            costPrice: cost,
+            costPrice: cost!,
             barcode: _barcodeController.text.trim(),
             sku: _skuController.text.trim(),
           );
@@ -145,16 +145,15 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
             TextFormField(
               controller: _costPriceController,
               decoration: const InputDecoration(
-                labelText: 'Cost Price (KES) - Optional',
+                labelText: 'Cost Price (KES)',
                 border: OutlineInputBorder(),
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
               validator: (v) {
-                if (v != null && v.isNotEmpty && double.tryParse(v) == null) {
-                  return 'Invalid number';
-                }
+                if (v == null || v.isEmpty) return 'Required';
+                if (double.tryParse(v) == null) return 'Invalid number';
                 return null;
               },
             ),

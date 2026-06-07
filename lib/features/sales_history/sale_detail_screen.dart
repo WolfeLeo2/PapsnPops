@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
+import 'widgets/log_payment_dialog.dart';
 import '../../../domain/models/sale.dart';
 import '../../../domain/models/sale_item.dart';
 import '../../../domain/models/customer.dart';
@@ -48,6 +49,7 @@ class SaleDetailScreen extends ConsumerWidget {
           final items = data['items'] as List<SaleItem>;
           final customer = data['customer'] as Customer?;
           final invoice = data['invoice'] as Invoice?;
+          final totalPaid = data['totalPaid'] as int? ?? 0;
           final cashierName = data['cashierName'] as String;
           final staffName = data['staffName'] as String?;
 
@@ -116,7 +118,7 @@ class SaleDetailScreen extends ConsumerWidget {
 
                           // Invoice B2B Details
                           if (invoice != null) ...[
-                            _buildInvoiceSection(context, ref, invoice, customer, cs, tt),
+                            _buildInvoiceSection(context, ref, sale, invoice, customer, totalPaid, cs, tt),
                             const SizedBox(height: 16),
                             const Divider(),
                             const SizedBox(height: 16),
@@ -261,50 +263,44 @@ class SaleDetailScreen extends ConsumerWidget {
                       border: Border(top: BorderSide(color: cs.outline)),
                     ),
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.end,
                       children: [
-                        if (isOwner && !sale.isVoided) ...[
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => _voidSale(context, ref, sale.id),
-                              icon: const PhosphorIcon(PhosphorIconsRegular.trash, size: 16),
-                              label: const Text('Void Sale'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: cs.error,
-                                side: BorderSide(color: cs.error),
-                                minimumSize: const Size(0, 48),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                        ],
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => _shareReceipt(ref, sale, items, customer, invoice, cashierName, staffName),
-                            icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 16),
-                            label: const Text('Share Receipt'),
+                        if (isOwner && !sale.isVoided)
+                          OutlinedButton.icon(
+                            onPressed: () => _voidSale(context, ref, sale.id),
+                            icon: const PhosphorIcon(PhosphorIconsRegular.trash, size: 16),
+                            label: const Text('Void Sale'),
                             style: OutlinedButton.styleFrom(
+                              foregroundColor: cs.error,
+                              side: BorderSide(color: cs.error),
                               minimumSize: const Size(0, 48),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
+                            ),
+                          ),
+                        OutlinedButton.icon(
+                          onPressed: () => _shareReceipt(ref, sale, items, customer, invoice, cashierName, staffName),
+                          icon: const PhosphorIcon(PhosphorIconsRegular.shareNetwork, size: 16),
+                          label: const Text('Share Receipt'),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(0, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FilledButton.icon(
-                            onPressed: () => _printReceipt(ref, sale, items, customer, invoice, cashierName, staffName),
-                            icon: const PhosphorIcon(PhosphorIconsRegular.printer, size: 16),
-                            label: const Text('Print Receipt'),
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size(0, 48),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                        FilledButton.icon(
+                          onPressed: () => _printReceipt(ref, sale, items, customer, invoice, cashierName, staffName),
+                          icon: const PhosphorIcon(PhosphorIconsRegular.printer, size: 16),
+                          label: const Text('Print Receipt'),
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(0, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                         ),
@@ -418,12 +414,15 @@ class SaleDetailScreen extends ConsumerWidget {
   Widget _buildInvoiceSection(
     BuildContext context,
     WidgetRef ref,
+    Sale sale,
     Invoice invoice,
     Customer? customer,
+    int totalPaid,
     ColorScheme cs,
     TextTheme tt,
   ) {
     final isPaid = invoice.status == 'paid';
+    final balance = sale.total - totalPaid;
     return Container(
       decoration: BoxDecoration(
         color: cs.surfaceContainer,
@@ -466,6 +465,14 @@ class SaleDetailScreen extends ConsumerWidget {
           const Divider(),
           const SizedBox(height: 8),
           
+          _buildDetailRow('Total Paid', CurrencyHelper.format(totalPaid), cs, tt),
+          const SizedBox(height: 4),
+          _buildDetailRow('Balance Due', CurrencyHelper.format(balance), cs, tt, isBold: true),
+          
+          const SizedBox(height: 12),
+          const Divider(),
+          const SizedBox(height: 8),
+          
           // Customer details
           if (customer != null) ...[
             Text('Client Details', style: tt.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
@@ -486,9 +493,9 @@ class SaleDetailScreen extends ConsumerWidget {
           if (!isPaid) ...[
             const SizedBox(height: 16),
             FilledButton.icon(
-              onPressed: () => _markInvoicePaid(context, ref, invoice.id),
-              icon: const PhosphorIcon(PhosphorIconsRegular.check, size: 16),
-              label: const Text('Mark as Paid'),
+              onPressed: () => _logPayment(context, ref, sale, invoice, balance),
+              icon: const PhosphorIcon(PhosphorIconsRegular.plus, size: 16),
+              label: const Text('Log Payment'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 40),
                 backgroundColor: cs.primary,
@@ -501,38 +508,18 @@ class SaleDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _markInvoicePaid(BuildContext context, WidgetRef ref, String invoiceId) async {
-    final scaffold = ScaffoldMessenger.of(context);
-    final isMounted = State;
-    
-    // We are inside a stateless widget, so context mounted check:
-    final confirm = await showDialog<bool>(
+  void _logPayment(BuildContext context, WidgetRef ref, Sale sale, Invoice invoice, int balanceDue) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Mark Invoice Paid'),
-        content: const Text('Are you sure you want to mark this invoice as paid?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
-          ),
-        ],
+      builder: (context) => LogPaymentDialog(
+        invoiceId: invoice.id,
+        branchId: sale.branchId,
+        balanceDue: balanceDue,
       ),
     );
 
-    if (confirm == true) {
-      try {
-        await ref.read(invoiceRepositoryProvider).markAsPaid(invoiceId, DateTime.now());
-        scaffold.showSnackBar(const SnackBar(content: Text('Invoice marked as paid')));
-        // Refresh details
-        ref.invalidate(saleDetailProvider(saleId));
-      } catch (e) {
-        scaffold.showSnackBar(SnackBar(content: Text('Error marking invoice as paid: $e')));
-      }
+    if (result == true) {
+      ref.invalidate(saleDetailProvider(sale.id));
     }
   }
 

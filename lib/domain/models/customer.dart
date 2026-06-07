@@ -1,5 +1,6 @@
 class Customer {
   final String id;
+  final String organisationId;
   final String name;
   final String phone;
   final String? companyName;
@@ -10,6 +11,7 @@ class Customer {
 
   Customer({
     required this.id,
+    required this.organisationId,
     required this.name,
     required this.phone,
     this.companyName,
@@ -22,6 +24,7 @@ class Customer {
   factory Customer.fromRow(Map<String, dynamic> row) {
     return Customer(
       id: row['id'] as String,
+      organisationId: row['organisation_id'] as String,
       name: row['name'] as String,
       phone: row['phone'] as String,
       companyName: row['company_name'] as String?,
@@ -35,6 +38,7 @@ class Customer {
   Map<String, dynamic> toRow() {
     return {
       'id': id,
+      'organisation_id': organisationId,
       'name': name,
       'phone': phone,
       'company_name': companyName,

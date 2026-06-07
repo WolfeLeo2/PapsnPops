@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app.dart';
+import '../auth/auth_provider.dart';
 import 'settings_provider.dart';
 
-import 'branch_settings.dart';
-import 'business_settings.dart';
-import 'promotions_screen.dart';
+/* import 'branch_settings.dart'; */
+/* import 'promotions_screen.dart'; */
 import 'staff_settings.dart';
 import 'user_accounts_screen.dart';
 
@@ -71,101 +70,104 @@ class SettingsScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(selectedSettingsCategoryProvider);
     final theme = Theme.of(context);
     final themeMode = ref.watch(themeModeProvider);
-    final isDark = theme.brightness == Brightness.dark;
 
-    return SettingsList(
-      lightTheme: SettingsThemeData(
-        settingsListBackground: theme.colorScheme.surface,
-        settingsSectionBackground: theme.colorScheme.surfaceContainer,
-        titleTextColor: theme.colorScheme.primary,
-      ),
-      darkTheme: SettingsThemeData(
-        settingsListBackground: theme.colorScheme.surface,
-        settingsSectionBackground: theme.colorScheme.surfaceContainer,
-        titleTextColor: theme.colorScheme.primary,
-      ),
-      sections: [
-        SettingsSection(
-          title: const Text('Organization'),
-          tiles: [
-            _buildTile(
-              context: context,
-              ref: ref,
-              isDesktop: isDesktop,
-              category: SettingsCategory.business,
-              icon: PhosphorIconsRegular.buildings,
-              isSelected: selectedCategory == SettingsCategory.business,
-            ),
-            _buildTile(
-              context: context,
-              ref: ref,
-              isDesktop: isDesktop,
-              category: SettingsCategory.branches,
-              icon: PhosphorIconsRegular.storefront,
-              isSelected: selectedCategory == SettingsCategory.branches,
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: const Text('Access & Staff'),
-          tiles: [
-            _buildTile(
-              context: context,
-              ref: ref,
-              isDesktop: isDesktop,
-              category: SettingsCategory.users,
-              icon: PhosphorIconsRegular.users,
-              isSelected: selectedCategory == SettingsCategory.users,
-            ),
-            _buildTile(
-              context: context,
-              ref: ref,
-              isDesktop: isDesktop,
-              category: SettingsCategory.staff,
-              icon: PhosphorIconsRegular.identificationBadge,
-              isSelected: selectedCategory == SettingsCategory.staff,
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: const Text('Sales'),
-          tiles: [
-            _buildTile(
-              context: context,
-              ref: ref,
-              isDesktop: isDesktop,
-              category: SettingsCategory.promotions,
-              icon: PhosphorIconsRegular.tag,
-              isSelected: selectedCategory == SettingsCategory.promotions,
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: const Text('Appearance'),
-          tiles: [
-            SettingsTile(
-              title: const Text('Theme Mode'),
-              leading: const PhosphorIcon(PhosphorIconsRegular.palette),
-              trailing: SegmentedButton<ThemeMode>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(value: ThemeMode.system, label: Text('System')),
-                  ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-                  ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+    final user = ref.watch(authProvider);
+    final isOwner = user?.userMetadata?['role'] == 'owner';
+
+    return ListView(
+      children: [
+        if (isOwner) ...[
+          /*
+          _buildSectionHeader(context, 'Organization'),
+          _buildTile(
+            context: context,
+            ref: ref,
+            isDesktop: isDesktop,
+            category: SettingsCategory.branches,
+            icon: PhosphorIconsRegular.storefront,
+            isSelected: selectedCategory == SettingsCategory.branches,
+          ),
+          const Divider(),
+          */
+          _buildSectionHeader(context, 'Access & Staff'),
+          _buildTile(
+            context: context,
+            ref: ref,
+            isDesktop: isDesktop,
+            category: SettingsCategory.users,
+            icon: PhosphorIconsRegular.users,
+            isSelected: selectedCategory == SettingsCategory.users,
+          ),
+          _buildTile(
+            context: context,
+            ref: ref,
+            isDesktop: isDesktop,
+            category: SettingsCategory.staff,
+            icon: PhosphorIconsRegular.identificationBadge,
+            isSelected: selectedCategory == SettingsCategory.staff,
+          ),
+          /*
+          _buildTile(
+            context: context,
+            ref: ref,
+            isDesktop: isDesktop,
+            category: SettingsCategory.promotions,
+            icon: PhosphorIconsRegular.ticket,
+            isSelected: selectedCategory == SettingsCategory.promotions,
+          ),
+          */
+          const Divider(),
+        ],
+        _buildSectionHeader(context, 'Appearance'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const PhosphorIcon(PhosphorIconsRegular.palette),
+                  const SizedBox(width: 16),
+                  Text('Theme Mode', style: theme.textTheme.bodyLarge),
                 ],
-                selected: {themeMode},
-                onSelectionChanged: (set) {
-                  ref.read(themeModeProvider.notifier).setMode(set.first);
-                },
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<ThemeMode>(
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: ThemeMode.system, label: Text('System')),
+                    ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+                    ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+                  ],
+                  selected: {themeMode},
+                  onSelectionChanged: (set) {
+                    ref.read(themeModeProvider.notifier).setMode(set.first);
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  SettingsTile _buildTile({
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildTile({
     required BuildContext context,
     required WidgetRef ref,
     required bool isDesktop,
@@ -181,34 +183,43 @@ class SettingsScreen extends ConsumerWidget {
         ? theme.colorScheme.onPrimaryContainer
         : theme.colorScheme.onSurface;
 
-    return SettingsTile.navigation(
-      leading: PhosphorIcon(icon, color: textColor),
-      title: Text(
-        category.label,
-        style: TextStyle(color: textColor, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+    return Container(
+      color: tileColor,
+      child: ListTile(
+        leading: PhosphorIcon(icon, color: textColor),
+        title: Text(
+          category.label,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        trailing: isDesktop ? null : const Icon(Icons.chevron_right),
+        onTap: () {
+          if (isDesktop) {
+            ref.read(selectedSettingsCategoryProvider.notifier).select(category);
+          } else {
+            context.push(category.route);
+          }
+        },
       ),
-      onPressed: (context) {
-        if (isDesktop) {
-          ref.read(selectedSettingsCategoryProvider.notifier).select(category);
-        } else {
-          context.push(category.route);
-        }
-      },
     );
   }
 
   Widget _buildCategoryContent(SettingsCategory category) {
     switch (category) {
-      case SettingsCategory.business:
-        return const BusinessSettings();
+      /*
       case SettingsCategory.branches:
         return const BranchSettings();
+      */
       case SettingsCategory.users:
         return const UserAccountsScreen();
       case SettingsCategory.staff:
         return const StaffSettings();
+      /*
       case SettingsCategory.promotions:
         return const PromotionsScreen();
+      */
     }
   }
 }

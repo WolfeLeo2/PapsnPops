@@ -44,7 +44,7 @@ class TabItem {
       'variant_name': variantName,
       'quantity': quantity,
       'unit_price': unitPrice,
-      'added_by': addedBy,
+      'added_by': addedBy?.isEmpty == true ? null : addedBy,
       'created_at': createdAt.toIso8601String(),
     };
   }

@@ -31,4 +31,5 @@ streams:
       - SELECT tab_items.* FROM tab_items WHERE tab_id IN (SELECT open_tabs.id FROM open_tabs INNER JOIN user_branches ON open_tabs.branch_id = user_branches.branch_id)
       - SELECT staff.* FROM staff INNER JOIN user_branches ON staff.branch_id = user_branches.branch_id
       - SELECT invoices.* FROM invoices INNER JOIN user_branches ON invoices.branch_id = user_branches.branch_id
+      - SELECT invoice_payments.* FROM invoice_payments INNER JOIN user_branches ON invoice_payments.branch_id = user_branches.branch_id
       - SELECT cash_reconciliations.* FROM cash_reconciliations INNER JOIN user_branches ON cash_reconciliations.branch_id = user_branches.branch_id

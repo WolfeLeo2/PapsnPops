@@ -53,13 +53,13 @@ class OpenTab {
       'branch_id': branchId,
       'name': name,
       'phone': phone,
-      'opened_by': openedBy,
-      'customer_id': customerId,
+      'opened_by': openedBy?.isEmpty == true ? null : openedBy,
+      'customer_id': customerId?.isEmpty == true ? null : customerId,
       'is_open': isOpen ? 1 : 0,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'closed_at': closedAt?.toIso8601String(),
-      'sale_id': saleId,
+      'sale_id': saleId?.isEmpty == true ? null : saleId,
     };
   }
 }

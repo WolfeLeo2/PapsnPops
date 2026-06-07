@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'data/supabase/supabase_client.dart';
 import 'data/powersync/powersync_client.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'features/notifications/notification_service.dart';
 import 'app.dart';
 
 void main() async {
@@ -10,5 +12,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   await initializeSupabase();
   await initializePowerSync();
+  await Firebase.initializeApp();
+  setupFirebaseBackgroundHandler();
   runApp(const ProviderScope(child: PapsnPopsApp()));
 }

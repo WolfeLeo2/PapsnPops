@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/login_screen.dart';
 import 'features/auth/auth_provider.dart';
+import 'features/notifications/notification_service.dart';
 import 'shared/widgets/app_scaffold.dart';
 
 import 'features/dashboard/dashboard_screen.dart';
@@ -14,13 +15,13 @@ import 'features/stock/products_screen.dart';
 import 'features/stock/receive_stock_screen.dart';
 import 'features/reports/reports_screen.dart';
 import 'features/settings/branch_settings.dart';
-import 'features/settings/business_settings.dart';
 import 'features/settings/promotions_screen.dart';
 import 'features/settings/add_promotion_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/settings/staff_settings.dart';
 import 'features/settings/user_accounts_screen.dart';
 import 'features/stock/product_detail_screen.dart';
+import 'features/stock/stock_adjustments_review_screen.dart';
 import 'features/auth/signup_screen.dart';
 import 'features/auth/verify_screen.dart';
 import 'features/auth/onboarding_screen.dart';
@@ -137,6 +138,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: ReceiveStockScreen()),
           ),
           GoRoute(
+            path: '/stock-review',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StockAdjustmentsReviewScreen()),
+            redirect: (context, state) {
+              final user = ref.read(authProvider);
+              final role = user?.userMetadata?['role'];
+              if (role != 'owner') return '/pos';
+              return null;
+            },
+          ),
+          GoRoute(
             path: '/reports',
             pageBuilder: (context, state) =>
                 NoTransitionPage(child: ReportsScreen()),
@@ -152,10 +164,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) =>
                 NoTransitionPage(child: SettingsScreen()),
             routes: [
-              GoRoute(
-                path: 'business',
-                builder: (context, state) => const BusinessSettings(),
-              ),
               GoRoute(
                 path: 'branches',
                 builder: (context, state) => const BranchSettings(),
@@ -199,6 +207,7 @@ class PapsnPopsApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
+    ref.watch(notificationServiceProvider); // Initialize notification service
 
     return MaterialApp.router(
       title: 'PAPs n POPs',

@@ -340,7 +340,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   (int.tryParse(v.sellingPriceCtrl.text.replaceAll(',', '')) ??
                       0) *
                   100,
-              costPrice: null,
+              costPrice: 0,
               wholesalePrice: null,
               barcode: v.barcodeCtrl.text.trim(),
               sku: v.skuCtrl.text.trim(),

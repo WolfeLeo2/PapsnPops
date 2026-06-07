@@ -45,6 +45,7 @@ class UserAccountsScreen extends ConsumerWidget {
               settingsListBackground: theme.colorScheme.surface,
               settingsSectionBackground: theme.colorScheme.surfaceContainer,
             ),
+            applicationType: ApplicationType.material,
             sections: [
               if (owners.isNotEmpty)
                 SettingsSection(

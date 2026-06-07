@@ -271,6 +271,58 @@ abstract class _$SelectedSaleId extends $Notifier<String?> {
   }
 }
 
+@ProviderFor(SalesUnpaidOnly)
+final salesUnpaidOnlyProvider = SalesUnpaidOnlyProvider._();
+
+final class SalesUnpaidOnlyProvider
+    extends $NotifierProvider<SalesUnpaidOnly, bool> {
+  SalesUnpaidOnlyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'salesUnpaidOnlyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$salesUnpaidOnlyHash();
+
+  @$internal
+  @override
+  SalesUnpaidOnly create() => SalesUnpaidOnly();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$salesUnpaidOnlyHash() => r'cd95547d10d3ffbcaec83b36f1a9661fb05be5c4';
+
+abstract class _$SalesUnpaidOnly extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(salesHistoryStream)
 final salesHistoryStreamProvider = SalesHistoryStreamProvider._();
 
@@ -308,7 +360,7 @@ final class SalesHistoryStreamProvider
 }
 
 String _$salesHistoryStreamHash() =>
-    r'4d9770bda81f23337dc45b386109eda92c20305c';
+    r'2611498e8ad0d696e1104d7710fdcdd315305b2c';
 
 @ProviderFor(saleDetail)
 final saleDetailProvider = SaleDetailFamily._();
@@ -367,7 +419,7 @@ final class SaleDetailProvider
   }
 }
 
-String _$saleDetailHash() => r'8883091145ad737b88c51b8f4d5fcbb2e1a9a2bf';
+String _$saleDetailHash() => r'3f3467aaf0cbdde037253ffede2c8fd8d72bdc31';
 
 final class SaleDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Map<String, dynamic>>, String> {

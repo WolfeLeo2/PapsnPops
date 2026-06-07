@@ -290,44 +290,43 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Row(
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.end,
                   children: [
                     if (ref.watch(authProvider)?.userMetadata?['role'] == 'owner')
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _voidTab,
-                          icon: const PhosphorIcon(PhosphorIconsRegular.trash, size: 16),
-                          label: const Text('Void Tab'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: cs.error,
-                            side: BorderSide(color: cs.error),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (ref.watch(authProvider)?.userMetadata?['role'] == 'owner')
-                      const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          itemsAsync.whenData((items) {
-                            if (items.isNotEmpty) {
-                              _showCheckoutDialog(items);
-                            }
-                          });
-                        },
-                        icon: const PhosphorIcon(PhosphorIconsRegular.checkCircle, size: 18),
-                        label: const Text('Close & Charge'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: cs.primary,
+                      OutlinedButton.icon(
+                        onPressed: _voidTab,
+                        icon: const PhosphorIcon(PhosphorIconsRegular.trash, size: 16),
+                        label: const Text('Void Tab'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: cs.error,
+                          side: BorderSide(color: cs.error),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          minimumSize: const Size(0, 56), // match filled button padding roughly
                         ),
+                      ),
+                    FilledButton.icon(
+                      onPressed: () {
+                        itemsAsync.whenData((items) {
+                          if (items.isNotEmpty) {
+                            _showCheckoutDialog(items);
+                          }
+                        });
+                      },
+                      icon: const PhosphorIcon(PhosphorIconsRegular.checkCircle, size: 18),
+                      label: const Text('Close & Charge'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        minimumSize: const Size(0, 56),
                       ),
                     ),
                   ],
@@ -412,8 +411,10 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Payment Method Selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
                   children: [
                     ChoiceChip(
                       label: const Text('Cash'),
@@ -440,13 +441,13 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
                 ),
                 const SizedBox(height: 12),
                 
-                // M-Pesa Ref if M-Pesa selected
-                if (paymentMethod == 'mpesa') ...[
+                // Reference if M-Pesa or Card selected
+                if (paymentMethod == 'mpesa' || paymentMethod == 'card') ...[
                   TextField(
                     controller: refController,
-                    decoration: const InputDecoration(
-                      labelText: 'M-Pesa Reference',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: paymentMethod == 'mpesa' ? 'M-Pesa Reference' : 'Card Reference/Receipt No.',
+                      border: const OutlineInputBorder(),
                     ),
                     textCapitalization: TextCapitalization.characters,
                   ),
@@ -484,9 +485,10 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
               ),
               FilledButton(
                 onPressed: () {
-                  if (paymentMethod == 'mpesa' && refController.text.trim().isEmpty) {
+                  if ((paymentMethod == 'mpesa' || paymentMethod == 'card') && refController.text.trim().isEmpty) {
+                    final methodLabel = paymentMethod == 'mpesa' ? 'M-Pesa' : 'Card';
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter M-Pesa reference')),
+                      SnackBar(content: Text('Please enter $methodLabel reference')),
                     );
                     return;
                   }
@@ -518,7 +520,7 @@ class _TabDetailPanelState extends ConsumerState<TabDetailPanel> {
         staffId: staffId,
         customerId: widget.tab.customerId,
         paymentMethod: paymentMethod,
-        paymentReference: paymentMethod == 'mpesa' ? refController.text.trim().toUpperCase() : null,
+        paymentReference: (paymentMethod == 'mpesa' || paymentMethod == 'card') ? refController.text.trim().toUpperCase() : null,
         subtotal: total,
         discountAmount: 0,
         total: total,

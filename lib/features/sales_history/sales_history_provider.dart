@@ -45,6 +45,13 @@ class SelectedSaleId extends _$SelectedSaleId {
 }
 
 @riverpod
+class SalesUnpaidOnly extends _$SalesUnpaidOnly {
+  @override
+  bool build() => false;
+  void toggle() => state = !state;
+}
+
+@riverpod
 Stream<List<Sale>> salesHistoryStream(Ref ref) {
   final branchId = ref.watch(currentBranchIdProvider);
   if (branchId == null) return Stream.value([]);
@@ -53,9 +60,14 @@ Stream<List<Sale>> salesHistoryStream(Ref ref) {
   final dateRange = ref.watch(salesDateRangeProvider);
   final paymentMethod = ref.watch(salesPaymentMethodProvider);
   final source = ref.watch(salesSourceProvider);
+  final isUnpaidOnly = ref.watch(salesUnpaidOnlyProvider);
 
   String sql = 'SELECT DISTINCT s.* FROM sales s';
   final List<dynamic> params = [];
+
+  if (isUnpaidOnly) {
+    sql += ' INNER JOIN invoices inv ON s.id = inv.sale_id AND inv.status != \'paid\'';
+  }
 
   // Joins if searching
   if (query.isNotEmpty) {
@@ -116,10 +128,13 @@ Future<Map<String, dynamic>> saleDetail(Ref ref, String saleId) async {
   }
 
   Invoice? invoice;
+  int totalPaid = 0;
   if (sale.source == 'invoice') {
     final invRow = await db.getOptional('SELECT * FROM invoices WHERE sale_id = ?', [sale.id]);
     if (invRow != null) {
       invoice = Invoice.fromRow(invRow);
+      final paidRow = await db.getOptional('SELECT SUM(amount) as total_paid FROM invoice_payments WHERE invoice_id = ?', [invoice.id]);
+      totalPaid = (paidRow?['total_paid'] as int?) ?? 0;
     }
   }
 
@@ -138,6 +153,7 @@ Future<Map<String, dynamic>> saleDetail(Ref ref, String saleId) async {
     'items': items,
     'customer': customer,
     'invoice': invoice,
+    'totalPaid': totalPaid,
     'cashierName': cashierName,
     'staffName': staffName,
   };

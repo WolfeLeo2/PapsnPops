@@ -11,7 +11,9 @@ import '../../../data/repositories/branch_provider.dart';
 import '../../../features/auth/auth_provider.dart';
 import '../../../features/stock/stock_provider.dart' show generateV4Uuid;
 import '../pos_provider.dart';
+import '../pos_provider.dart';
 import 'receipt_screen.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class InvoiceSheet extends ConsumerStatefulWidget {
   const InvoiceSheet({super.key});
@@ -41,7 +43,6 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
   final _formKey = GlobalKey<FormState>();
   
   final _nameCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
   final _companyCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -54,10 +55,12 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
   int _dueDays = 7;
   DateTime? _customDueDate;
 
+  String _fullPhoneNumber = '';
+  String _expectedPaymentMethod = 'mpesa';
+
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _phoneCtrl.dispose();
     _companyCtrl.dispose();
     _addressCtrl.dispose();
     _emailCtrl.dispose();
@@ -87,7 +90,7 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
     setState(() {
       _selectedCustomerId = customer.id;
       _nameCtrl.text = customer.name;
-      _phoneCtrl.text = customer.phone;
+      _fullPhoneNumber = customer.phone;
       _companyCtrl.text = customer.companyName ?? '';
       _addressCtrl.text = customer.address ?? '';
       _emailCtrl.text = customer.email ?? '';
@@ -150,8 +153,9 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
         // Create new customer
         final customer = Customer(
           id: customerId,
+          organisationId: authUser.userMetadata?['organisation_id'] as String,
           name: _nameCtrl.text.trim(),
-          phone: _phoneCtrl.text.trim(),
+          phone: _fullPhoneNumber.trim(),
           companyName: _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
           address: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
           email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
@@ -173,7 +177,7 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
         cashierId: authUser.id,
         staffId: selectedStaffId,
         customerId: customerId,
-        paymentMethod: 'card', // Standard fallback since it's an invoice
+        paymentMethod: _expectedPaymentMethod,
         paymentReference: null,
         subtotal: subtotal,
         discountAmount: discount,
@@ -330,21 +334,18 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
               const SizedBox(height: 12),
 
               // Customer Phone
-              TextFormField(
-                controller: _phoneCtrl,
+              IntlPhoneField(
+                key: ValueKey(_selectedCustomerId ?? 'new'),
+                initialValue: _fullPhoneNumber,
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
-                  prefixIcon: Icon(Icons.phone_outlined),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
-                keyboardType: TextInputType.phone,
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Phone number is required';
-                  }
-                  return null;
+                initialCountryCode: 'KE',
+                onChanged: (phone) {
+                  _fullPhoneNumber = phone.completeNumber;
                 },
               ),
               const SizedBox(height: 12),
@@ -388,6 +389,33 @@ class _InvoiceSheetState extends ConsumerState<InvoiceSheet> {
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+
+              // Expected Payment Method
+              DropdownButtonFormField<String>(
+                value: _expectedPaymentMethod,
+                decoration: const InputDecoration(
+                  labelText: 'Expected Payment Method',
+                  prefixIcon: Icon(Icons.payment_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'mpesa', child: Text('M-Pesa')),
+                  DropdownMenuItem(value: 'bank', child: Text('Bank Transfer')),
+                  DropdownMenuItem(value: 'card', child: Text('Card')),
+                  DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      _expectedPaymentMethod = val;
+                    });
+                  }
+                },
               ),
               const SizedBox(height: 16),
 

@@ -144,7 +144,9 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
     return Scaffold(
       backgroundColor: cs.surfaceContainerLow,
       appBar: AppBar(
-        title: const Text('Checkout Success'),
+        title: Text(widget.invoice != null
+            ? (widget.invoice!.status == 'paid' ? 'Invoice Paid' : 'Invoice Generated')
+            : 'Checkout Success'),
         automaticallyImplyLeading: true,
         leading: IconButton(
           icon: const PhosphorIcon(PhosphorIconsRegular.caretLeft),
@@ -188,7 +190,9 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Transaction Complete',
+                          widget.invoice != null
+                              ? (widget.invoice!.status == 'paid' ? 'Invoice Paid' : 'Invoice Generated')
+                              : 'Transaction Complete',
                           style: tt.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: cs.onSurface,
