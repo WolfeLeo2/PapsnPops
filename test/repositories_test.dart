@@ -67,6 +67,7 @@ void main() {
     test('Create and search customer', () async {
       final customer = Customer(
         id: 'cust-1',
+        organisationId: 'org-1',
         name: 'John Doe',
         phone: '0712345678',
         companyName: 'ACME Corp',
@@ -451,9 +452,14 @@ void main() {
       final num2 = await invoiceRepo.getNextInvoiceNumber('branch-1-nairobi');
       expect(num2, equals('INV-BRAN-0002'));
 
-      // Mark paid
-      final paidTime = DateTime.now();
-      await invoiceRepo.markAsPaid('inv-1', paidTime);
+      // Mark paid by logging full payment
+      await invoiceRepo.logPayment(
+        invoiceId: 'inv-1',
+        branchId: 'branch-1-nairobi',
+        amount: 500,
+        paymentMethod: 'cash',
+        cashierId: 'cashier-1',
+      );
 
       final updatedInvoices = await testDb.getAll('SELECT * FROM invoices WHERE id = ?', ['inv-1']);
       expect(updatedInvoices.first['status'], equals('paid'));
