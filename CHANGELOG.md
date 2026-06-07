@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.2.0...v1.3.0) (2026-06-07)
+
+
+### Features
+
+* add logout button to sidebar and disconnect powersync on logout ([5d58c29](https://github.com/WolfeLeo2/PapsnPops/commit/5d58c29a5577f8f689a24d7dae16f33139d5d124))
+
 ## [1.2.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.1.0...v1.2.0) (2026-06-07)
 
 
