@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.3.0...v1.3.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* skip firebase messaging initialization on windows to prevent silent crashes ([12eff0d](https://github.com/WolfeLeo2/PapsnPops/commit/12eff0d0e6633bde2a875f286c96b4cb9c92e3fd))
+
 ## [1.3.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.2.0...v1.3.0) (2026-06-07)
 
 
