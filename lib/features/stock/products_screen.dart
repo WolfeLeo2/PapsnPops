@@ -98,6 +98,23 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                           padding: const EdgeInsets.only(right: 8),
                           child: FilterChip(
                             showCheckmark: false,
+                            label: const Text('Show Inactive'),
+                            selected: ref.watch(showInactiveProductsProvider),
+                            onSelected: (val) {
+                              ref.read(showInactiveProductsProvider.notifier).toggle(val);
+                            },
+                            selectedColor: cs.errorContainer,
+                            labelStyle: TextStyle(
+                              color: ref.watch(showInactiveProductsProvider) 
+                                ? cs.error 
+                                : cs.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            showCheckmark: false,
                             label: const Text('All Categories'),
                             selected: _selectedCategoryId == null,
                             onSelected: (_) =>

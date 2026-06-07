@@ -105,6 +105,28 @@ class ProductGridCard extends ConsumerWidget {
                             ),
                           ),
                         ),
+                        if (!product.isActive)
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: cs.errorContainer.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Inactive',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: cs.onErrorContainer,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

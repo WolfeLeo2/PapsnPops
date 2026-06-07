@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../domain/models/product_variant.dart';
+import '../../../data/repositories/product_repository.dart';
 import '../stock_provider.dart';
 
 class EditVariantSheet extends ConsumerStatefulWidget {
@@ -103,6 +104,56 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
     }
   }
 
+  Future<void> _handleToggleActive() async {
+    final isActive = widget.variant.isActive;
+    
+    if (isActive) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Deactivate Variant'),
+          content: Text('Are you sure you want to deactivate "${widget.variant.name}"?\n\nIt will be hidden from the POS but kept in reports.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+              child: const Text('Deactivate'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm != true) return;
+    }
+
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    try {
+      await ref.read(productRepositoryProvider).updateVariantActiveStatus(widget.variant.id, !isActive);
+      if (mounted) {
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(isActive ? 'Variant deactivated' : 'Variant reactivated')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -174,19 +225,39 @@ class _EditVariantSheetState extends ConsumerState<EditVariantSheet> {
               ),
             ),
             const SizedBox(height: 32),
-            FilledButton(
-              onPressed: _isLoading ? null : _save,
-              style: FilledButton.styleFrom(padding: const EdgeInsets.all(16)),
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _isLoading ? null : _handleToggleActive,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(16),
+                      side: BorderSide(
+                        color: widget.variant.isActive ? cs.error : cs.primary,
                       ),
-                    )
-                  : const Text('Save Changes'),
+                      foregroundColor: widget.variant.isActive ? cs.error : cs.primary,
+                    ),
+                    child: Text(widget.variant.isActive ? 'Deactivate' : 'Reactivate'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _isLoading ? null : _save,
+                    style: FilledButton.styleFrom(padding: const EdgeInsets.all(16)),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Save Changes'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

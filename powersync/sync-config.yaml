@@ -2,19 +2,25 @@ config:
   edition: 3
 
 streams:
-  # Global data that is not scoped to a specific branch. 
-  # All users get exactly one copy of these tables.
+  # Truly global data that is not scoped to an organization or branch.
   global_data:
     auto_subscribe: true
     queries:
-      - SELECT * FROM products
-      - SELECT * FROM product_variants
       - SELECT * FROM categories
       - SELECT * FROM adjustment_reasons
-      - SELECT * FROM promotions
-      - SELECT * FROM customers
-      - SELECT * FROM branches
-      - SELECT * FROM user_profiles
+
+  # Org data scoped to the user's organization.
+  org_data:
+    auto_subscribe: true
+    with:
+      user_org: SELECT organisation_id FROM user_profiles WHERE id = auth.user_id()
+    queries:
+      - SELECT products.* FROM products INNER JOIN user_org ON products.organisation_id = user_org.organisation_id
+      - SELECT product_variants.* FROM product_variants WHERE product_variants.product_id IN (SELECT products.id FROM products INNER JOIN user_org ON products.organisation_id = user_org.organisation_id)
+      - SELECT promotions.* FROM promotions INNER JOIN user_org ON promotions.organisation_id = user_org.organisation_id
+      - SELECT customers.* FROM customers INNER JOIN user_org ON customers.organisation_id = user_org.organisation_id
+      - SELECT branches.* FROM branches INNER JOIN user_org ON branches.organisation_id = user_org.organisation_id
+      - SELECT user_profiles.* FROM user_profiles INNER JOIN user_org ON user_profiles.organisation_id = user_org.organisation_id
 
   # Branch data scoped to the branches the user has access to.
   # We extract the branch IDs from the JWT metadata array.

@@ -6,10 +6,12 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../core/utils/currency.dart';
 import '../../core/utils/stock_display.dart';
 import '../../domain/models/product_variant.dart';
+import '../../domain/models/product.dart';
 import '../../shared/widgets/stat_card.dart';
 import 'product_detail_provider.dart';
 import 'stock_provider.dart';
 import 'widgets/edit_variant_sheet.dart';
+import '../../data/repositories/product_repository.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   final String productId;
@@ -33,7 +35,10 @@ class ProductDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const PhosphorIcon(PhosphorIconsRegular.pencilSimple),
             onPressed: () {
-              // Edit product metadata
+              final pv = ref.read(productsProvider).value?.firstWhere((p) => p.product.id == productId);
+              if (pv != null) {
+                _showEditNameDialog(context, ref, pv.product);
+              }
             },
           ),
           const SizedBox(width: 8),
@@ -219,6 +224,27 @@ class ProductDetailScreen extends ConsumerWidget {
                                             ),
                                           ),
                                         ],
+                                        if (!variant.isActive) ...[
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: cs.errorContainer,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              'INACTIVE',
+                                              style: theme.textTheme.labelSmall?.copyWith(
+                                                color: cs.onErrorContainer,
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 9,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                     const SizedBox(height: 4),
@@ -266,6 +292,32 @@ class ProductDetailScreen extends ConsumerWidget {
                     );
                   },
                 ),
+
+                const SizedBox(height: 32),
+
+                // Delete / Reactivate Actions
+                if (product.isActive)
+                  OutlinedButton.icon(
+                    icon: PhosphorIcon(PhosphorIconsBold.trash, color: cs.error),
+                    label: Text('Delete Product', style: TextStyle(color: cs.error)),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: cs.error),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: () => _handleDelete(context, ref, product),
+                  )
+                else
+                  FilledButton.icon(
+                    icon: const PhosphorIcon(PhosphorIconsBold.arrowCounterClockwise),
+                    label: const Text('Reactivate Product'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: () async {
+                      await ref.read(productRepositoryProvider).updateProductActiveStatus(product.id, true);
+                    },
+                  ),
+                const SizedBox(height: 32),
               ],
             ),
           );
@@ -273,4 +325,104 @@ class ProductDetailScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _handleDelete(BuildContext context, WidgetRef ref, Product product) async {
+  final repo = ref.read(productRepositoryProvider);
+  
+  // Show confirmation first
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete Product'),
+      content: Text('Are you sure you want to delete "${product.name}"?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+          child: const Text('Delete'),
+        ),
+      ],
+    ),
+  );
+  
+  if (confirm != true) return;
+  if (!context.mounted) return;
+  
+  try {
+    await repo.hardDeleteProduct(product.id);
+    if (context.mounted) {
+      context.pop(); // Navigate back on success
+    }
+  } catch (e) {
+    if (!context.mounted) return;
+    
+    // Fallback to soft delete
+    final deactivate = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cannot Delete'),
+        content: const Text(
+          'This product has sales history and cannot be fully deleted.\n\n'
+          'Would you like to deactivate it instead? It will be hidden from the POS but kept in reports.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Deactivate'),
+          ),
+        ],
+      ),
+    );
+    
+    if (deactivate == true) {
+      await repo.updateProductActiveStatus(product.id, false);
+      if (context.mounted) {
+        context.pop(); // Also go back
+      }
+    }
+  }
+}
+
+Future<void> _showEditNameDialog(BuildContext context, WidgetRef ref, Product product) async {
+  final controller = TextEditingController(text: product.name);
+  final repo = ref.read(productRepositoryProvider);
+  
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Edit Product Name'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'Product Name'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty && newName != product.name) {
+                await repo.updateProductName(product.id, newName);
+              }
+              if (context.mounted) context.pop();
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
 }

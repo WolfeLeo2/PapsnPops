@@ -8,15 +8,29 @@ import '../../shared/widgets/stat_card.dart';
 import 'dashboard_provider.dart';
 import 'widgets/dashboard_card.dart';
 import '../../core/utils/stock_display.dart';
+import '../../core/utils/update_service.dart';
 import '../stock/stock_provider.dart';
 
 import '../../shared/widgets/app_scaffold.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(updateServiceProvider).checkForUpdates(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 

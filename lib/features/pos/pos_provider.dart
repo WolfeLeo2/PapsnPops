@@ -208,7 +208,7 @@ Stream<List<ProductWithVariants>> filteredProducts(Ref ref) {
   final categoryId = ref.watch(selectedCategoryProvider);
   final productRepo = ref.watch(productRepositoryProvider);
 
-  return productRepo.watchAllProducts().map((products) {
+  return productRepo.watchAllProducts(includeInactive: false).map((products) {
     return products.where((p) {
       // Filter by category
       if (categoryId != null && p.product.categoryId != categoryId) {

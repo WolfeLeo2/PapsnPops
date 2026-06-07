@@ -20,9 +20,18 @@ String generateV4Uuid() {
       '${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
 }
 
+class ShowInactiveProductsNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+  void toggle(bool val) => state = val;
+}
+
+final showInactiveProductsProvider = NotifierProvider<ShowInactiveProductsNotifier, bool>(() => ShowInactiveProductsNotifier());
+
 final productsProvider = StreamProvider<List<ProductWithVariants>>((ref) {
   final repo = ref.watch(productRepositoryProvider);
-  return repo.watchAllProducts();
+  final includeInactive = ref.watch(showInactiveProductsProvider);
+  return repo.watchAllProducts(includeInactive: includeInactive);
 });
 
 final branchStockProvider = StreamProvider<List<StockLevel>>((ref) {

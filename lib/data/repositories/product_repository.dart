@@ -3,6 +3,7 @@ import '../../domain/models/product.dart';
 import '../../domain/models/product_variant.dart';
 import '../../domain/models/product_with_variants.dart';
 import '../powersync/powersync_client.dart';
+import '../supabase/supabase_client.dart';
 
 final productRepositoryProvider = Provider<ProductRepository>((ref) {
   return ProductRepository();
@@ -10,8 +11,10 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
 
 class ProductRepository {
   /// Streams all products joined with their variants, ordered by product name.
-  Stream<List<ProductWithVariants>> watchAllProducts() {
+  Stream<List<ProductWithVariants>> watchAllProducts({bool includeInactive = false}) {
     // Watch the products table — any change (product or variant) triggers a new emit.
+    final activeFilter = includeInactive ? '' : 'WHERE p.is_active = 1 AND (pv.is_active = 1 OR pv.id IS NULL)';
+    
     return db
         .watch('''
       SELECT
@@ -38,10 +41,33 @@ class ProductRepository {
         pv.created_at AS variant_created_at
       FROM products p
       LEFT JOIN product_variants pv ON pv.product_id = p.id
-      WHERE p.is_active = 1
+      $activeFilter
       ORDER BY p.name ASC, pv.is_default DESC, pv.name ASC
     ''')
         .map((rows) => _groupRows(rows));
+  }
+
+  Future<void> updateProductActiveStatus(String productId, bool isActive) async {
+    await supabase.from('products').update({'is_active': isActive}).eq('id', productId);
+  }
+
+  Future<void> updateVariantActiveStatus(String variantId, bool isActive) async {
+    await supabase.from('product_variants').update({'is_active': isActive}).eq('id', variantId);
+  }
+
+  Future<void> hardDeleteProduct(String productId) async {
+    try {
+      await supabase.from('products').delete().eq('id', productId);
+    } catch (e) {
+      if (e.toString().contains('foreign key constraint') || e.toString().contains('23503')) {
+        throw Exception('Cannot delete product with transaction history');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> updateProductName(String productId, String newName) async {
+    await supabase.from('products').update({'name': newName}).eq('id', productId);
   }
 
   List<ProductWithVariants> _groupRows(List<Map<String, dynamic>> rows) {
