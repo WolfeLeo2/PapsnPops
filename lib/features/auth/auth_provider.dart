@@ -85,6 +85,14 @@ class Auth extends _$Auth {
     }
   }
 
+  Future<void> updateUserName(String id, String name) async {
+    await supabase.from('user_profiles').update({'full_name': name}).eq('id', id);
+  }
+
+  Future<void> updateUserStatus(String id, bool isActive) async {
+    await supabase.from('user_profiles').update({'is_active': isActive}).eq('id', id);
+  }
+
   Future<void> loginWithPassword(String email, String password) async {
     await supabase.auth.signInWithPassword(email: email, password: password);
   }

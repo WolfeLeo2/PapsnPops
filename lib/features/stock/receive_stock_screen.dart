@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../domain/models/product_with_variants.dart';
 import '../../data/repositories/branch_provider.dart';
 import '../../features/auth/auth_provider.dart';
+import '../../shared/widgets/qty_stepper.dart';
 import 'stock_provider.dart';
 import 'widgets/tenthing_widget.dart';
 
@@ -573,7 +574,8 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              _QtyStepper(
+              QtyStepper(
+                minQuantity: 0,
                 quantity: state.pieceQuantity,
                 onChanged: (val) =>
                     setState(() => state.pieceQuantity = val > 0 ? val : 1),
@@ -597,7 +599,8 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Actual Count:'),
-          _QtyStepper(
+          QtyStepper(
+            minQuantity: 0,
             quantity: state.pieceQuantity,
             onChanged: (val) =>
                 setState(() => state.pieceQuantity = val >= 0 ? val : 0),
@@ -616,7 +619,8 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Quantity ($containerName s):'),
-              _QtyStepper(
+              QtyStepper(
+                minQuantity: 0,
                 quantity: state.volumeReceiveContainers,
                 onChanged: (val) => setState(
                   () => state.volumeReceiveContainers = val > 0 ? val : 1,
@@ -644,7 +648,8 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Full Sealed $containerName s:'),
-              _QtyStepper(
+              QtyStepper(
+                minQuantity: 0,
                 quantity: state.volumeAdjustFull,
                 onChanged: (val) =>
                     setState(() => state.volumeAdjustFull = val >= 0 ? val : 0),
@@ -656,7 +661,8 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Open $containerName s:'),
-              _QtyStepper(
+              QtyStepper(
+                minQuantity: 0,
                 quantity: state.volumeAdjustOpenCount,
                 onChanged: (val) {
                   setState(() {
@@ -692,40 +698,5 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
         ],
       );
     }
-  }
-}
-
-class _QtyStepper extends StatelessWidget {
-  final int quantity;
-  final ValueChanged<int> onChanged;
-
-  const _QtyStepper({required this.quantity, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const PhosphorIcon(PhosphorIconsBold.minus),
-          onPressed: () => onChanged(quantity - 1),
-          style: IconButton.styleFrom(backgroundColor: cs.surfaceContainerHigh),
-        ),
-        SizedBox(
-          width: 48,
-          child: Text(
-            quantity.toString(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ),
-        IconButton(
-          icon: const PhosphorIcon(PhosphorIconsBold.plus),
-          onPressed: () => onChanged(quantity + 1),
-          style: IconButton.styleFrom(backgroundColor: cs.surfaceContainerHigh),
-        ),
-      ],
-    );
   }
 }

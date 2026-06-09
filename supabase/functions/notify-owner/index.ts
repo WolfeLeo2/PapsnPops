@@ -31,9 +31,9 @@ serve(async (req) => {
 
     // 1. Determine the message based on the event
     if (table === "sales") {
-      if (type === "INSERT" && record.total >= 500000) {
-        // High value sale (> KES 5,000)
-        title = "High Value Sale!";
+      if (type === "INSERT" && record.total >= 100000) {
+        // High value sale (> KES 1,000)
+        title = "New Sale!";
         body = `A new sale of KES ${(record.total / 100).toLocaleString()} was just made.`;
       } else if (type === "UPDATE" && record.is_voided === true && (!old_record || old_record.is_voided !== true)) {
         title = "Sale Voided";

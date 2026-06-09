@@ -179,6 +179,7 @@ const schema = Schema([
     Column.text('role'),
     Column.text('organisation_id'),
     Column.text('branch_ids'),
+    Column.integer('is_active'),
     Column.text('created_at'),
   ]),
 ]);
