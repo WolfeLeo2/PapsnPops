@@ -14,6 +14,8 @@ class UpdateService {
   static const _repoUrl = 'https://api.github.com/repos/WolfeLeo2/PapsnPops/releases/latest';
 
   Future<void> checkForUpdates(BuildContext context) async {
+    if (!Platform.isWindows) return;
+
     try {
       final response = await _dio.get(_repoUrl);
       if (response.statusCode == 200) {
