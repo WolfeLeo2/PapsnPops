@@ -63,6 +63,7 @@ dependencies:
   intl_phone_field: ^3.2.0
   package_info_plus: ^10.1.0
   dio: ^5.9.2
+  url_launcher: ^6.3.2
 
 dependency_overrides:
   phosphor_flutter:

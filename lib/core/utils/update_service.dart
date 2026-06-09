@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final updateServiceProvider = Provider<UpdateService>((ref) {
   return UpdateService();
@@ -14,7 +15,7 @@ class UpdateService {
   static const _repoUrl = 'https://api.github.com/repos/WolfeLeo2/PapsnPops/releases/latest';
 
   Future<void> checkForUpdates(BuildContext context) async {
-    if (!Platform.isWindows) return;
+    if (!Platform.isWindows && !Platform.isAndroid) return;
 
     try {
       final response = await _dio.get(_repoUrl);
@@ -33,8 +34,9 @@ class UpdateService {
         // Simple version check (assumes semantic versioning like 1.0.4)
         if (isMockTesting || _isNewerVersion(latestVersion, currentVersion)) {
           final assets = data['assets'] as List;
+          final extensionTarget = Platform.isWindows ? '.exe' : '.apk';
           final installerAsset = assets.firstWhere(
-            (asset) => (asset['name'] as String).endsWith('.exe'),
+            (asset) => (asset['name'] as String).endsWith(extensionTarget),
             orElse: () => null,
           );
 
@@ -84,6 +86,16 @@ class UpdateService {
   }
 
   Future<void> downloadAndInstallUpdate(String url, Function(double) onProgress) async {
+    if (Platform.isAndroid) {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw Exception('Could not launch browser to download update.');
+      }
+      return;
+    }
+
     try {
       final tempDir = await getTemporaryDirectory();
       final savePath = '${tempDir.path}\\PAPs_n_POPs_Installer.exe';
