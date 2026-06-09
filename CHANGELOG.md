@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.5.0...v1.6.0) (2026-06-09)
+
+
+### Features
+
+* user and staff deletion + text qtystepper ([9bdf383](https://github.com/WolfeLeo2/PapsnPops/commit/9bdf3836933c3ce7a7b479a6c3035a75a6082ede))
+
 ## [1.5.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.4.0...v1.5.0) (2026-06-07)
 
 
