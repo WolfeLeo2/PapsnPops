@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.6.0...v1.7.0) (2026-06-09)
+
+
+### Features
+
+* auto update support for Android via apk ([61dc7eb](https://github.com/WolfeLeo2/PapsnPops/commit/61dc7eb1091f08384ca2b64ec611af50a7183a6a))
+
+
+### Bug Fixes
+
+* restrict auto updater banner to windows only ([905ba13](https://github.com/WolfeLeo2/PapsnPops/commit/905ba13363ece06924cc30aedc3cf8be5bdfb8de))
+
 ## [1.6.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.5.0...v1.6.0) (2026-06-09)
 
 
