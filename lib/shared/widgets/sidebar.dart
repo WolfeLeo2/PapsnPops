@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../data/repositories/branch_provider.dart';
 import '../../features/auth/auth_provider.dart';
+import '../../data/powersync/powersync_client.dart';
 
 class Sidebar extends ConsumerWidget {
   final bool isExpanded;
@@ -16,6 +17,35 @@ class Sidebar extends ConsumerWidget {
     required this.onToggle,
     required this.isMobile,
   });
+
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final hasPending = await hasPendingPowerSyncUploads();
+    if (hasPending) {
+      if (!context.mounted) return;
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Pending Uploads'),
+          content: const Text(
+            'You have offline data waiting to sync. If you log out now, this data will be permanently lost.\n\nPlease connect to the internet to sync before logging out.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: TextButton.styleFrom(foregroundColor: Theme.of(ctx).colorScheme.error),
+              child: const Text('Force Logout'),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true) return;
+    }
+    ref.read(authProvider.notifier).logout();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -370,9 +400,7 @@ class Sidebar extends ConsumerWidget {
                           IconButton(
                             icon: const PhosphorIcon(PhosphorIconsRegular.signOut),
                             color: cs.error,
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                            },
+                            onPressed: () => _handleLogout(context, ref),
                             tooltip: 'Logout',
                           ),
                         ],
@@ -383,7 +411,7 @@ class Sidebar extends ConsumerWidget {
                       offset: const Offset(50, 0),
                       onSelected: (val) {
                         if (val == 'logout') {
-                          ref.read(authProvider.notifier).logout();
+                          _handleLogout(context, ref);
                         }
                       },
                       itemBuilder: (context) => [

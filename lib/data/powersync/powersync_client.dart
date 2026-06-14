@@ -82,3 +82,8 @@ Future<void> connectPowerSync() async {
 Future<void> disconnectPowerSync() async {
   await db.disconnectAndClear();
 }
+
+Future<bool> hasPendingPowerSyncUploads() async {
+  final transaction = await db.getNextCrudTransaction();
+  return transaction != null && transaction.crud.isNotEmpty;
+}
