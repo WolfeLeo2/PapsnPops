@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.7.0...v1.8.0) (2026-06-14)
+
+
+### Features
+
+* check for pending uploads before logout to prevent data loss ([25dfa9d](https://github.com/WolfeLeo2/PapsnPops/commit/25dfa9d827151cf8e28bc12b25d92ce8ceb4b0ac))
+
+
+### Bug Fixes
+
+* correct SQL type casting in timezone migration ([2687583](https://github.com/WolfeLeo2/PapsnPops/commit/2687583624e98b18c9c640d8459242484895d076))
+* revert to disconnectAndClear() for security ([d05c214](https://github.com/WolfeLeo2/PapsnPops/commit/d05c21424a69c7910f704578368f08d3f6eafc84))
+
 ## [1.7.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.6.0...v1.7.0) (2026-06-09)
 
 
