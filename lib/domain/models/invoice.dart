@@ -32,13 +32,13 @@ class Invoice {
       invoiceNumber: row['invoice_number'] as String,
       status: row['status'] as String? ?? 'unpaid',
       dueDate: row['due_date'] != null
-          ? DateTime.parse(row['due_date'] as String)
+          ? DateTime.parse(row['due_date'] as String).toLocal()
           : null,
       notes: row['notes'] as String?,
       paidAt: row['paid_at'] != null
-          ? DateTime.parse(row['paid_at'] as String)
+          ? DateTime.parse(row['paid_at'] as String).toLocal()
           : null,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -52,8 +52,8 @@ class Invoice {
       'status': status,
       'due_date': dueDate?.toIso8601String().split('T')[0],
       'notes': notes,
-      'paid_at': paidAt?.toIso8601String(),
-      'created_at': createdAt.toIso8601String(),
+      'paid_at': paidAt?.toUtc().toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

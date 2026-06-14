@@ -74,7 +74,7 @@ class Promotion {
       happyHourEnd: row['happy_hour_end'] as String?,
       activeDays: activeDays,
       createdAt: row['created_at'] != null
-          ? DateTime.parse(row['created_at'] as String)
+          ? DateTime.parse(row['created_at'] as String).toLocal()
           : DateTime.now(),
     );
   }
@@ -94,7 +94,7 @@ class Promotion {
       'happy_hour_start': happyHourStart,
       'happy_hour_end': happyHourEnd,
       'active_days': jsonEncode(activeDays),
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

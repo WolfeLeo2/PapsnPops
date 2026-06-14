@@ -43,7 +43,7 @@ class ProductVariant {
       sku: row['sku'] as String?,
       isActive: (row['is_active'] as int? ?? 1) == 1,
       isDefault: (row['is_default'] as int? ?? 0) == 1,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -61,7 +61,7 @@ class ProductVariant {
       'sku': sku,
       'is_active': isActive ? 1 : 0,
       'is_default': isDefault ? 1 : 0,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

@@ -96,7 +96,7 @@ class NotificationService {
       'user_id': userId,
       'fcm_token': fcmToken,
       'device_type': deviceType,
-      'updated_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
     }, onConflict: 'fcm_token');
   }
 

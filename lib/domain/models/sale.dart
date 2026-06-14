@@ -70,11 +70,11 @@ class Sale {
       isVoided: (row['is_voided'] as int? ?? 0) == 1,
       voidedBy: row['voided_by'] as String?,
       voidedAt: row['voided_at'] != null
-          ? DateTime.parse(row['voided_at'] as String)
+          ? DateTime.parse(row['voided_at'] as String).toLocal()
           : null,
       source: row['source'] as String? ?? 'pos',
       tabId: row['tab_id'] as String?,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -93,10 +93,10 @@ class Sale {
       'promotion_ids': (promotionIds != null && promotionIds!.isNotEmpty) ? jsonEncode(promotionIds) : null,
       'is_voided': isVoided ? 1 : 0,
       'voided_by': voidedBy?.isEmpty == true ? null : voidedBy,
-      'voided_at': voidedAt?.toIso8601String(),
+      'voided_at': voidedAt?.toUtc().toIso8601String(),
       'source': source,
       'tab_id': tabId?.isEmpty == true ? null : tabId,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

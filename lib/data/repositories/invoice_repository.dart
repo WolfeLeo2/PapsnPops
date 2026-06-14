@@ -40,7 +40,7 @@ class InvoiceRepository {
         saleRow.values.toList(),
       );
 
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       // 2. For each SaleItem in items
       for (final item in items) {
@@ -76,7 +76,7 @@ class InvoiceRepository {
             'Sale',
             sale.id,
             sale.cashierId,
-            sale.createdAt.toIso8601String(),
+            sale.createdAt.toUtc().toIso8601String(),
           ],
         );
 
@@ -119,7 +119,7 @@ class InvoiceRepository {
     String? paymentReference,
     required String cashierId,
   }) async {
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     await db.writeTransaction((tx) async {
       await tx.execute('''
         INSERT INTO invoice_payments (id, invoice_id, branch_id, amount, payment_method, payment_reference, cashier_id, created_at)

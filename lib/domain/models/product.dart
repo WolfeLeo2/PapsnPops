@@ -31,7 +31,7 @@ class Product {
       baseUnit: row['base_unit'] as String? ?? 'piece',
       containerSize: row['container_size'] as int?,
       containerName: row['container_name'] as String?,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -45,7 +45,7 @@ class Product {
       'base_unit': baseUnit,
       'container_size': containerSize,
       'container_name': containerName,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

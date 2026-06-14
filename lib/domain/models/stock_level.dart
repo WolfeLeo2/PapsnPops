@@ -19,7 +19,7 @@ class StockLevel {
       branchId: row['branch_id'] as String,
       productId: row['product_id'] as String,
       quantity: row['quantity'] as int? ?? 0,
-      lastUpdated: DateTime.parse(row['updated_at'] as String),
+      lastUpdated: DateTime.parse(row['updated_at'] as String).toLocal(),
     );
   }
 }

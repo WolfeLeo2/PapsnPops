@@ -96,7 +96,7 @@ class StockAdjustmentController {
     // We will execute a write transaction.
 
     await db.writeTransaction((tx) async {
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       for (final branchId in selectedBranches) {
         for (final item in items) {
@@ -160,7 +160,7 @@ class StockAdjustmentController {
     required String userId,
   }) async {
     await db.writeTransaction((tx) async {
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       // Mark original as reverted
       await tx.execute(
@@ -218,7 +218,7 @@ class StockAdjustmentController {
   }
 
   Future<void> addAdjustmentReason(String name) async {
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     await db.execute(
       'INSERT INTO adjustment_reasons (id, name, created_at) VALUES (uuid(), ?, ?)',
       [name, now],
@@ -226,7 +226,7 @@ class StockAdjustmentController {
   }
 
   Future<void> addCategory(String name) async {
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     await db.execute(
       'INSERT INTO categories (id, name, created_at) VALUES (uuid(), ?, ?)',
       [name, now],
@@ -276,7 +276,7 @@ class ProductController {
     required List<VariantInput> variants,
   }) async {
     final productId = generateV4Uuid();
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
 
     await db.writeTransaction((tx) async {
       await tx.execute(
@@ -383,7 +383,7 @@ class StockAdjustmentRecord {
       quantityDelta: row['quantity'] as int,
       reason: row['reason'] as String? ?? 'Adjustment',
       referenceId: row['reference_id'] as String?,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       branchId: row['branch_id'] as String,
       branchName: row['branch_name'] as String? ?? 'Unknown Branch',
       userId: row['user_id'] as String,

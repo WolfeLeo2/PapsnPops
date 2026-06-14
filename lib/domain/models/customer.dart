@@ -31,7 +31,7 @@ class Customer {
       address: row['address'] as String?,
       email: row['email'] as String?,
       loyaltyPoints: row['loyalty_points'] as int? ?? 0,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -45,7 +45,7 @@ class Customer {
       'address': address,
       'email': email,
       'loyalty_points': loyaltyPoints,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

@@ -65,7 +65,7 @@ class SaleRepository {
         saleRow.values.toList(),
       );
 
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       // 2. For each SaleItem in items
       for (final item in items) {
@@ -101,7 +101,7 @@ class SaleRepository {
             'Sale',
             sale.id,
             sale.cashierId,
-            sale.createdAt.toIso8601String(),
+            sale.createdAt.toUtc().toIso8601String(),
           ],
         );
 
@@ -140,7 +140,7 @@ class SaleRepository {
 
       final itemRows = await tx.getAll('SELECT * FROM sale_items WHERE sale_id = ?', [saleId]);
       final items = itemRows.map((row) => SaleItem.fromRow(row)).toList();
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       // Update sale
       await tx.execute(

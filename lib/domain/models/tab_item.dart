@@ -31,7 +31,7 @@ class TabItem {
       quantity: row['quantity'] as int? ?? 0,
       unitPrice: row['unit_price'] as int? ?? 0,
       addedBy: row['added_by'] as String?,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
@@ -45,7 +45,7 @@ class TabItem {
       'quantity': quantity,
       'unit_price': unitPrice,
       'added_by': addedBy?.isEmpty == true ? null : addedBy,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }

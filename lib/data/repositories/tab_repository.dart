@@ -86,7 +86,7 @@ class TabRepository {
         saleRow.values.toList(),
       );
 
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
 
       // 2. For each SaleItem in items
       for (final item in items) {
@@ -122,7 +122,7 @@ class TabRepository {
             'Sale',
             sale.id,
             sale.cashierId,
-            sale.createdAt.toIso8601String(),
+            sale.createdAt.toUtc().toIso8601String(),
           ],
         );
 

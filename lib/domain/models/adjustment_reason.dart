@@ -13,11 +13,11 @@ class AdjustmentReason {
     return AdjustmentReason(
       id: row['id'] as String,
       name: row['name'] as String,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
     );
   }
 
   Map<String, dynamic> toRow() {
-    return {'id': id, 'name': name, 'created_at': createdAt.toIso8601String()};
+    return {'id': id, 'name': name, 'created_at': createdAt.toUtc().toIso8601String()};
   }
 }

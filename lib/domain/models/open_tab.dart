@@ -34,14 +34,14 @@ class OpenTab {
       openedBy: row['opened_by'] as String?,
       customerId: row['customer_id'] as String?,
       isOpen: (row['is_open'] as int? ?? 1) == 1,
-      createdAt: DateTime.parse(row['created_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: row['updated_at'] != null
-          ? DateTime.parse(row['updated_at'] as String)
+          ? DateTime.parse(row['updated_at'] as String).toLocal()
           : (row['created_at'] != null
-              ? DateTime.parse(row['created_at'] as String)
+              ? DateTime.parse(row['created_at'] as String).toLocal()
               : DateTime.now()),
       closedAt: row['closed_at'] != null
-          ? DateTime.parse(row['closed_at'] as String)
+          ? DateTime.parse(row['closed_at'] as String).toLocal()
           : null,
       saleId: row['sale_id'] as String?,
     );
@@ -56,9 +56,9 @@ class OpenTab {
       'opened_by': openedBy?.isEmpty == true ? null : openedBy,
       'customer_id': customerId?.isEmpty == true ? null : customerId,
       'is_open': isOpen ? 1 : 0,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-      'closed_at': closedAt?.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
+      'updated_at': updatedAt.toUtc().toIso8601String(),
+      'closed_at': closedAt?.toUtc().toIso8601String(),
       'sale_id': saleId?.isEmpty == true ? null : saleId,
     };
   }

@@ -31,7 +31,7 @@ class Branch {
       'name': name,
       'location': location,
       'phone': phone,
-      'created_at': createdAt?.toIso8601String(),
+      'created_at': createdAt?.toUtc().toIso8601String(),
     };
   }
 }
