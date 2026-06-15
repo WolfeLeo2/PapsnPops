@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.0...v1.8.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* silence MSVC STL1011 coroutine deprecation error from flutter_local_notifications_windows ([d9b69bd](https://github.com/WolfeLeo2/PapsnPops/commit/d9b69bd55a8df093d1c49e17fa302c85449332a9))
+
 ## [1.8.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.7.0...v1.8.0) (2026-06-14)
 
 
