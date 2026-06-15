@@ -32,6 +32,11 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# Suppress MSVC STL1011 error about deprecated experimental coroutine headers.
+# This is required by flutter_local_notifications_windows until it migrates to C++20 coroutines.
+# See: https://github.com/MaikuB/flutter_local_notifications/issues/2777
+add_definitions(-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by
