@@ -4,53 +4,112 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
 
 final updateServiceProvider = Provider<UpdateService>((ref) {
   return UpdateService();
 });
 
+/// Result of an update check, with no UI side effects.
+class UpdateStatus {
+  /// The currently-installed app version (e.g. "1.8.0").
+  final String currentVersion;
+
+  /// The latest released version, if the check succeeded (e.g. "1.8.1").
+  final String? latestVersion;
+
+  /// Direct installer URL for this platform, set only when a newer version with
+  /// a matching asset (.apk / .exe) exists.
+  final String? downloadUrl;
+
+  /// Whether this platform supports in-app updates (Android / Windows).
+  final bool supported;
+
+  /// Whether the check failed (network/parse error). Distinct from "up to date".
+  final bool failed;
+
+  const UpdateStatus({
+    required this.currentVersion,
+    this.latestVersion,
+    this.downloadUrl,
+    this.supported = true,
+    this.failed = false,
+  });
+
+  /// True when a newer version is installable on this platform.
+  bool get updateAvailable => downloadUrl != null && latestVersion != null;
+}
+
 class UpdateService {
   final Dio _dio = Dio();
   static const _repoUrl = 'https://api.github.com/repos/WolfeLeo2/PapsnPops/releases/latest';
 
+  /// Guards against re-prompting on the same app run. The shell that triggers
+  /// the check can remount (e.g. on auth token refresh), so without this the
+  /// banner could re-appear even after the user dismissed it with "Later".
+  bool _alreadyChecked = false;
+
+  /// Auto-check used on app launch (from AppScaffold). Guarded so it runs once
+  /// per session and shows the banner only when an update is actually available.
   Future<void> checkForUpdates(BuildContext context) async {
     if (!Platform.isWindows && !Platform.isAndroid) return;
+    if (_alreadyChecked) return;
+    _alreadyChecked = true;
+
+    final status = await fetchUpdateStatus();
+    if (status.failed) {
+      // Allow a retry later this session since the failure was transient.
+      _alreadyChecked = false;
+      return;
+    }
+    if (status.updateAvailable && context.mounted) {
+      showUpdateBanner(context, status.latestVersion!, status.downloadUrl!);
+    }
+  }
+
+  /// Queries the latest GitHub release and reports update status WITHOUT showing
+  /// any UI. Used by the Settings tile so it can display the current version and
+  /// whether an update exists. Never throws — failures are reported via
+  /// [UpdateStatus.failed].
+  Future<UpdateStatus> fetchUpdateStatus() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentVersion = packageInfo.version;
+
+    if (!Platform.isWindows && !Platform.isAndroid) {
+      return UpdateStatus(currentVersion: currentVersion, supported: false);
+    }
 
     try {
       final response = await _dio.get(_repoUrl);
-      if (response.statusCode == 200) {
-        final data = response.data;
-        final tagName = data['tag_name'] as String;
-        // The tag might be "v1.0.4", let's strip the 'v'
-        final latestVersion = tagName.startsWith('v') ? tagName.substring(1) : tagName;
-        
-        final packageInfo = await PackageInfo.fromPlatform();
-        final currentVersion = packageInfo.version;
+      if (response.statusCode != 200) {
+        return UpdateStatus(currentVersion: currentVersion, failed: true);
+      }
+      final data = response.data;
+      final tagName = data['tag_name'] as String;
+      // The tag might be "v1.0.4", strip the leading 'v'.
+      final latestVersion = tagName.startsWith('v') ? tagName.substring(1) : tagName;
 
-        // Set to true only when testing UI, otherwise false
-        final bool isMockTesting = false;
-        
-        // Simple version check (assumes semantic versioning like 1.0.4)
-        if (isMockTesting || _isNewerVersion(latestVersion, currentVersion)) {
-          final assets = data['assets'] as List;
-          final extensionTarget = Platform.isWindows ? '.exe' : '.apk';
-          final installerAsset = assets.firstWhere(
-            (asset) => (asset['name'] as String).endsWith(extensionTarget),
-            orElse: () => null,
-          );
-
-          if (installerAsset != null) {
-            final downloadUrl = installerAsset['browser_download_url'] as String;
-            if (context.mounted) {
-              _showUpdateBanner(context, latestVersion, downloadUrl);
-            }
-          }
+      String? downloadUrl;
+      if (_isNewerVersion(latestVersion, currentVersion)) {
+        final assets = data['assets'] as List;
+        final extensionTarget = Platform.isWindows ? '.exe' : '.apk';
+        final installerAsset = assets.firstWhere(
+          (asset) => (asset['name'] as String).endsWith(extensionTarget),
+          orElse: () => null,
+        );
+        if (installerAsset != null) {
+          downloadUrl = installerAsset['browser_download_url'] as String;
         }
       }
+
+      return UpdateStatus(
+        currentVersion: currentVersion,
+        latestVersion: latestVersion,
+        downloadUrl: downloadUrl,
+      );
     } catch (e) {
-      // Silently fail on network/update errors so it doesn't disrupt the user
       debugPrint('Error checking for updates: $e');
+      return UpdateStatus(currentVersion: currentVersion, failed: true);
     }
   }
 
@@ -70,7 +129,7 @@ class UpdateService {
     }
   }
 
-  void _showUpdateBanner(BuildContext context, String version, String downloadUrl) {
+  void showUpdateBanner(BuildContext context, String version, String downloadUrl) {
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
         content: _UpdateBannerContent(
@@ -85,37 +144,64 @@ class UpdateService {
     );
   }
 
-  Future<void> downloadAndInstallUpdate(String url, Function(double) onProgress) async {
+  /// Downloads the installer for this platform (reporting [onProgress] 0..1) and
+  /// then launches it:
+  ///  - Android: opens the system package installer for the downloaded APK.
+  ///  - Windows: runs the Inno Setup installer silently; it replaces the running
+  ///    exe and relaunches the app, so this never returns (the app exits).
+  Future<void> downloadAndInstallUpdate(String url, void Function(double) onProgress) async {
+    final tempDir = await getTemporaryDirectory();
+
     if (Platform.isAndroid) {
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        throw Exception('Could not launch browser to download update.');
+      final savePath = '${tempDir.path}/PAPs_n_POPs_update.apk';
+      try {
+        await _dio.download(
+          url,
+          savePath,
+          onReceiveProgress: (received, total) {
+            if (total > 0) onProgress(received / total);
+          },
+        );
+      } catch (e) {
+        debugPrint('Error downloading update: $e');
+        throw Exception('Failed to download update.');
+      }
+
+      // Hand the APK to the system installer (requires REQUEST_INSTALL_PACKAGES
+      // + the user's one-time "install unknown apps" consent).
+      final result = await OpenFilex.open(
+        savePath,
+        type: 'application/vnd.android.package-archive',
+      );
+      if (result.type != ResultType.done) {
+        throw Exception('Could not open the installer: ${result.message}');
       }
       return;
     }
 
-    try {
-      final tempDir = await getTemporaryDirectory();
+    if (Platform.isWindows) {
       final savePath = '${tempDir.path}\\PAPs_n_POPs_Installer.exe';
+      try {
+        await _dio.download(
+          url,
+          savePath,
+          onReceiveProgress: (received, total) {
+            if (total > 0) onProgress(received / total);
+          },
+        );
+      } catch (e) {
+        debugPrint('Error downloading update: $e');
+        throw Exception('Failed to download update.');
+      }
 
-      await _dio.download(
-        url,
+      // Silent install. UAC may still prompt once (installer needs elevation);
+      // the installer replaces the running exe and relaunches the app for us.
+      await Process.start(
         savePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            onProgress(received / total);
-          }
-        },
+        ['/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'],
+        mode: ProcessStartMode.detached,
       );
-
-      // Execute installer and exit
-      await Process.start(savePath, [], mode: ProcessStartMode.detached);
       exit(0);
-    } catch (e) {
-      debugPrint('Error downloading update: $e');
-      throw Exception('Failed to download update.');
     }
   }
 }

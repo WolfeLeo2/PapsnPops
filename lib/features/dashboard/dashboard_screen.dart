@@ -8,7 +8,6 @@ import '../../shared/widgets/stat_card.dart';
 import 'dashboard_provider.dart';
 import 'widgets/dashboard_card.dart';
 import '../../core/utils/stock_display.dart';
-import '../../core/utils/update_service.dart';
 import '../stock/stock_provider.dart';
 
 import '../../shared/widgets/app_scaffold.dart';
@@ -21,13 +20,8 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(updateServiceProvider).checkForUpdates(context);
-    });
-  }
+  // Update check now runs app-wide from AppScaffold so all roles (incl. cashiers
+  // who never open the dashboard) are prompted. See lib/shared/widgets/app_scaffold.dart.
 
   @override
   Widget build(BuildContext context) {

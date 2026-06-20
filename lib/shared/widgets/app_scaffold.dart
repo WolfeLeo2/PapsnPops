@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/update_service.dart';
 import 'sidebar.dart';
 import 'upload_issue_banner.dart';
 
@@ -14,12 +15,30 @@ final railExpandedProvider = NotifierProvider<RailExpanded, bool>(
   RailExpanded.new,
 );
 
-class AppScaffold extends ConsumerWidget {
+class AppScaffold extends ConsumerStatefulWidget {
   final Widget child;
   const AppScaffold({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppScaffold> createState() => _AppScaffoldState();
+}
+
+class _AppScaffoldState extends ConsumerState<AppScaffold> {
+  @override
+  void initState() {
+    super.initState();
+    // Run once per session for the whole app (this shell persists across all
+    // in-app navigation), so every role — including cashiers who never see the
+    // dashboard — gets the update prompt regardless of which screen they're on.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(updateServiceProvider).checkForUpdates(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final child = widget.child;
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 600;

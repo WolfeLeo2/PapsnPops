@@ -18,6 +18,11 @@ OutputBaseFilename=PAPs_n_POPs_Installer
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+; Self-update support: the running app is closed (Restart Manager) so its exe can
+; be replaced. We relaunch it ourselves from [Run] (see below), so disable Inno's
+; own restart to avoid launching it twice.
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -35,4 +40,8 @@ Name: "{autoprograms}\PAPs n POPs"; Filename: "{app}\paps_n_pops.exe"
 Name: "{autodesktop}\PAPs n POPs"; Filename: "{app}\paps_n_pops.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\paps_n_pops.exe"; Description: "{cm:LaunchProgram,PAPs n POPs}"; Flags: nowait postinstall skipifsilent
+; Interactive install: offer to launch at the end of the wizard.
+; runasoriginaluser keeps the app de-elevated even though setup ran elevated.
+Filename: "{app}\paps_n_pops.exe"; Description: "{cm:LaunchProgram,PAPs n POPs}"; Flags: nowait postinstall skipifsilent runasoriginaluser
+; Silent (auto-update) install: relaunch the app automatically once files are replaced.
+Filename: "{app}\paps_n_pops.exe"; Flags: nowait runasoriginaluser; Check: WizardSilent
