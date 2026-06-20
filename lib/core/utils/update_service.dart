@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -80,11 +81,25 @@ class UpdateService {
     }
 
     try {
-      final response = await _dio.get(_repoUrl);
+      final response = await _dio.get(
+        _repoUrl,
+        options: Options(
+          // GitHub's REST API returns 403 if there is no User-Agent header.
+          headers: {
+            'User-Agent': 'PapsnPops-App',
+            'Accept': 'application/vnd.github+json',
+          },
+          // Don't let Dio throw on non-2xx; we handle status explicitly below.
+          validateStatus: (_) => true,
+        ),
+      );
       if (response.statusCode != 200) {
+        debugPrint('Update check HTTP ${response.statusCode}: ${response.data}');
         return UpdateStatus(currentVersion: currentVersion, failed: true);
       }
-      final data = response.data;
+      final data = response.data is String
+          ? jsonDecode(response.data as String)
+          : response.data;
       final tagName = data['tag_name'] as String;
       // The tag might be "v1.0.4", strip the leading 'v'.
       final latestVersion = tagName.startsWith('v') ? tagName.substring(1) : tagName;
