@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.2...v1.9.0) (2026-06-20)
+
+
+### Features
+
+* Updated the updated service to work well for both android and ([2520d05](https://github.com/WolfeLeo2/PapsnPops/commit/2520d057d96626c5a2221184160bbfba74ce8f4c))
+
 ## [1.8.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.1...v1.8.2) (2026-06-20)
 
 
