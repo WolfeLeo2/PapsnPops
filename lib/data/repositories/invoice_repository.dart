@@ -3,6 +3,7 @@ import '../../domain/models/invoice.dart';
 import '../../domain/models/sale.dart';
 import '../../domain/models/sale_item.dart';
 import '../powersync/powersync_client.dart';
+import '../../core/utils/error_reporting.dart';
 
 final invoiceRepositoryProvider = Provider<InvoiceRepository>((ref) {
   return InvoiceRepository();
@@ -26,6 +27,23 @@ class InvoiceRepository {
   }
 
   Future<void> createInvoice(
+    Invoice invoice,
+    Sale sale,
+    List<SaleItem> items,
+  ) =>
+      guardWrite(
+        ErrorArea.invoiceWrite,
+        'createInvoice',
+        () => _createInvoice(invoice, sale, items),
+        tags: {'branch_id': sale.branchId},
+        data: {
+          'invoice_id': invoice.id,
+          'sale_id': sale.id,
+          'item_count': items.length,
+        },
+      );
+
+  Future<void> _createInvoice(
     Invoice invoice,
     Sale sale,
     List<SaleItem> items,
@@ -112,6 +130,29 @@ class InvoiceRepository {
   }
 
   Future<void> logPayment({
+    required String invoiceId,
+    required String branchId,
+    required int amount,
+    required String paymentMethod,
+    String? paymentReference,
+    required String cashierId,
+  }) =>
+      guardWrite(
+        ErrorArea.invoiceWrite,
+        'logPayment',
+        () => _logPayment(
+          invoiceId: invoiceId,
+          branchId: branchId,
+          amount: amount,
+          paymentMethod: paymentMethod,
+          paymentReference: paymentReference,
+          cashierId: cashierId,
+        ),
+        tags: {'branch_id': branchId, 'invoice_id': invoiceId},
+        data: {'amount': amount, 'payment_method': paymentMethod},
+      );
+
+  Future<void> _logPayment({
     required String invoiceId,
     required String branchId,
     required int amount,

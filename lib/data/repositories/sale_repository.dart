@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/sale.dart';
 import '../../domain/models/sale_item.dart';
 import '../powersync/powersync_client.dart';
+import '../../core/utils/error_reporting.dart';
 
 final saleRepositoryProvider = Provider<SaleRepository>((ref) {
   return SaleRepository();
@@ -54,7 +55,15 @@ class SaleRepository {
     return (sale, items);
   }
 
-  Future<void> createSale(Sale sale, List<SaleItem> items) async {
+  Future<void> createSale(Sale sale, List<SaleItem> items) => guardWrite(
+        ErrorArea.saleWrite,
+        'createSale',
+        () => _createSale(sale, items),
+        tags: {'branch_id': sale.branchId},
+        data: {'sale_id': sale.id, 'item_count': items.length},
+      );
+
+  Future<void> _createSale(Sale sale, List<SaleItem> items) async {
     await db.writeTransaction((tx) async {
       // 1. Insert sale using dynamically generated SQL from row map
       final saleRow = sale.toRow();
@@ -127,7 +136,14 @@ class SaleRepository {
     });
   }
 
-  Future<void> voidSale(String saleId, String voidedBy) async {
+  Future<void> voidSale(String saleId, String voidedBy) => guardWrite(
+        ErrorArea.saleWrite,
+        'voidSale',
+        () => _voidSale(saleId, voidedBy),
+        tags: {'sale_id': saleId},
+      );
+
+  Future<void> _voidSale(String saleId, String voidedBy) async {
     await db.writeTransaction((tx) async {
       final saleRow = await tx.getOptional('SELECT * FROM sales WHERE id = ?', [saleId]);
       if (saleRow == null) {

@@ -4,6 +4,7 @@ import '../../domain/models/tab_item.dart';
 import '../../domain/models/sale.dart';
 import '../../domain/models/sale_item.dart';
 import '../powersync/powersync_client.dart';
+import '../../core/utils/error_reporting.dart';
 
 final tabRepositoryProvider = Provider<TabRepository>((ref) {
   return TabRepository();
@@ -75,7 +76,16 @@ class TabRepository {
     );
   }
 
-  Future<void> closeTab(String tabId, Sale sale, List<SaleItem> items) async {
+  Future<void> closeTab(String tabId, Sale sale, List<SaleItem> items) =>
+      guardWrite(
+        ErrorArea.tabWrite,
+        'closeTab',
+        () => _closeTab(tabId, sale, items),
+        tags: {'branch_id': sale.branchId},
+        data: {'tab_id': tabId, 'sale_id': sale.id, 'item_count': items.length},
+      );
+
+  Future<void> _closeTab(String tabId, Sale sale, List<SaleItem> items) async {
     await db.writeTransaction((tx) async {
       // 1. Insert sale using dynamically generated SQL from row map
       final saleRow = sale.toRow();

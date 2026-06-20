@@ -8,6 +8,7 @@ import '../../data/repositories/branch_provider.dart';
 import '../../data/powersync/powersync_client.dart';
 import '../../domain/models/category.dart';
 import '../../domain/models/adjustment_reason.dart';
+import '../../core/utils/error_reporting.dart';
 
 // ── UUID helper (no external package needed) ──────────────────────────────────
 String generateV4Uuid() {
@@ -266,6 +267,33 @@ class VariantInput {
 
 class ProductController {
   Future<void> saveProduct({
+    required String name,
+    required String? categoryId,
+    required int reorderLevel,
+    required String organisationId,
+    required String baseUnit,
+    int? containerSize,
+    String? containerName,
+    required List<VariantInput> variants,
+  }) =>
+      guardWrite(
+        ErrorArea.stockWrite,
+        'saveProduct',
+        () => _saveProduct(
+          name: name,
+          categoryId: categoryId,
+          reorderLevel: reorderLevel,
+          organisationId: organisationId,
+          baseUnit: baseUnit,
+          containerSize: containerSize,
+          containerName: containerName,
+          variants: variants,
+        ),
+        tags: {'organisation_id': organisationId},
+        data: {'product_name': name, 'variant_count': variants.length},
+      );
+
+  Future<void> _saveProduct({
     required String name,
     required String? categoryId,
     required int reorderLevel,

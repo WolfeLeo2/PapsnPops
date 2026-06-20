@@ -3,10 +3,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'schema.dart';
 import '../supabase/supabase_client.dart';
 import '../../core/config/app_config.dart';
+import '../../core/utils/error_reporting.dart';
 
 late PowerSyncDatabase db;
 
@@ -128,10 +131,31 @@ class SupabaseConnector extends PowerSyncBackendConnector {
             op.table, op.op.toString(), op.id, e.code, e.message);
           uploadDeadLetters.add(dl);
           debugPrint('PowerSync upload dead-lettered: $dl');
+          // Surface to Sentry so we can see WHICH table/code fails across the
+          // fleet — a dropped row means data never reached the server.
+          unawaited(reportDataError(
+            e,
+            area: ErrorArea.sync,
+            operation: 'upload_dead_letter',
+            level: SentryLevel.warning,
+            tags: {
+              'table': op.table,
+              'crud_op': op.op.toString(),
+              if (e.code != null) 'pg_code': e.code!,
+            },
+            data: {'row_id': op.id, 'message': e.message},
+          ));
           continue;
         }
-        // Transient (e.g. 5xx). Abort without completing; PowerSync will retry
-        // the whole transaction later.
+        // Transient (e.g. 5xx / network). Abort without completing; PowerSync
+        // will retry the whole transaction later. Leave a breadcrumb so it shows
+        // in the trail of any later crash, but don't capture (retries are noisy).
+        Sentry.addBreadcrumb(Breadcrumb(
+          message: 'Transient upload error on ${op.table}#${op.id}',
+          category: 'sync',
+          level: SentryLevel.warning,
+          data: {'pg_code': e.code ?? 'null', 'message': e.message},
+        ));
         rethrow;
       }
     }

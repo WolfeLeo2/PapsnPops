@@ -310,6 +310,19 @@ drains, those sales are **gone permanently**. There is a recent guard
    layouts) shows a persistent error banner with a Details dialog and dismiss/clear when
    any change was skipped. Still in-memory — persisting to a local table survives app
    restarts and is a worthwhile follow-up.
+6. ✅ **Centralized data-error reporting to Sentry** — new `core/utils/error_reporting.dart`
+   provides `reportDataError()` (structured, tagged, never throws) and `guardWrite()`
+   (report + rethrow so existing UI handling still runs). Wired into the places where
+   business data can be lost/corrupted:
+   - **Sync** (`uploadData`): dead-lettered ops captured as `warning` with tags
+     `area=sync`, `table`, `crud_op`, `pg_code`; transient errors leave a breadcrumb.
+   - **Local writes**: `createSale`, `voidSale`, `closeTab`, `createInvoice`,
+     `logPayment`, `saveProduct` wrapped with `guardWrite` (tags by area + branch/org,
+     extra context with ids/counts).
+   - Filter in Sentry by `area:*` or `pg_code:*` to see which operation/table fails
+     across the fleet. Unhandled errors are already captured by `SentryFlutter.init`.
+   - **Intentionally NOT instrumented:** model `fromRow` parse `catch(_)` blocks — they
+     run in hot stream loops over an optional field and would flood Sentry.
 6. Make `create-user` transactional; keep `user_branch_access` and JWT `branch_ids`
    identical via trigger/backfill (closes latent H2).
 7. Add an "all branches" sales view (or default owners to it); make the sales-history
