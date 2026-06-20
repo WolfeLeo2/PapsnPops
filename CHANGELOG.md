@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.1...v1.8.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* removed disconnectAndClear from logout, enabled PowerSync to continue sync in event of erroneous transaction, added UploadBanner to show sync errors, added Sentry for error logging ([957612f](https://github.com/WolfeLeo2/PapsnPops/commit/957612f5cb84c237c64530d2eabcac102c8467a5))
+
 ## [1.8.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.0...v1.8.1) (2026-06-15)
 
 
