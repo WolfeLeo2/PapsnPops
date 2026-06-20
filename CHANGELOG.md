@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.9.0...v1.9.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* added headers for Dio updateservice fetch ([e02af89](https://github.com/WolfeLeo2/PapsnPops/commit/e02af89b54d0ba76532898fe1b976e10813f4d4a))
+
 ## [1.9.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.8.2...v1.9.0) (2026-06-20)
 
 
