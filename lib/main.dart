@@ -7,6 +7,7 @@ import 'data/powersync/powersync_client.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'features/notifications/notification_service.dart';
 import 'app.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,5 +17,16 @@ void main() async {
     await Firebase.initializeApp();
     setupFirebaseBackgroundHandler();
   }
-  runApp(const ProviderScope(child: PapsnPopsApp()));
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://6cad5425183d8785a8d63f9c2b332a6d@o4511593304358912.ingest.de.sentry.io/4511593324281936';
+      // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
+      // We recommend adjusting this value in production.
+      options.tracesSampleRate = 1.0;
+      // The sampling rate for profiling is relative to tracesSampleRate
+      // Setting to 1.0 will profile 100% of sampled transactions:
+      options.profilesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(SentryWidget(child: const ProviderScope(child: PapsnPopsApp()))),
+  );
 }

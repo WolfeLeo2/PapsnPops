@@ -48,3 +48,6 @@ app.*.map.json
 # Environment variables
 .env
 dart_defines.json
+
+sentry.properties
+sentry-wizard

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'sidebar.dart';
+import 'upload_issue_banner.dart';
 
 class RailExpanded extends Notifier<bool> {
   @override
@@ -35,7 +36,14 @@ class AppScaffold extends ConsumerWidget {
                   isMobile: false,
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: child),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const UploadIssueBanner(),
+                      Expanded(child: child),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
@@ -53,7 +61,12 @@ class AppScaffold extends ConsumerWidget {
               child: Sidebar(isExpanded: true, onToggle: () {}, isMobile: true),
             ),
           ),
-          body: child,
+          body: Column(
+            children: [
+              const UploadIssueBanner(),
+              Expanded(child: child),
+            ],
+          ),
         );
       },
     );

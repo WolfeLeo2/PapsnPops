@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  sentry_flutter: ^9.22.0
   flutter:
     sdk: flutter
 
@@ -70,6 +71,7 @@ dependency_overrides:
     path: packages/phosphor_flutter
 
 dev_dependencies:
+  sentry_dart_plugin: ^3.4.0
   flutter_test:
     sdk: flutter
 
@@ -136,3 +138,9 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/icon/liquor_store.png"
     icon_size: 256
+
+sentry:
+  upload_debug_symbols: true
+  upload_source_maps: true
+  project: flutter
+  org: leo-v7
