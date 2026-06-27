@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://github.com/WolfeLeo2/PapsnPops/compare/v1.9.1...v1.10.0) (2026-06-27)
+
+
+### Features
+
+* added Moving-average sales calculation, bp toggle, reset data ([8afa7b3](https://github.com/WolfeLeo2/PapsnPops/commit/8afa7b3cb82ef48f6d2683b23448f0219dd0cb13))
+
+
+### Bug Fixes
+
+* added proper error reporting for sentry ([6cd83e6](https://github.com/WolfeLeo2/PapsnPops/commit/6cd83e6f10d7f4b1dcfb975c8a5d4c6511324bfe))
+
 ## [1.9.1](https://github.com/WolfeLeo2/PapsnPops/compare/v1.9.0...v1.9.1) (2026-06-20)
 
 
