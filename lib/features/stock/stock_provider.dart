@@ -74,14 +74,38 @@ final stockAdjustmentControllerProvider = Provider<StockAdjustmentController>((
   return StockAdjustmentController();
 });
 
+/// Quantity-weighted (moving-average) cost per base unit, weighted against the
+/// stock already on hand at the receiving branch. Falls back to the new price
+/// when there's no prior stock or no known prior cost (avoids dragging the
+/// average toward an unknown/zero cost).
+double movingAverageBaseCost({
+  required int onHandBase,
+  required double oldBaseCost,
+  required int receivedBase,
+  required double newBaseCost,
+}) {
+  if (onHandBase <= 0 || receivedBase <= 0 || oldBaseCost <= 0) {
+    return newBaseCost;
+  }
+  return (onHandBase * oldBaseCost + receivedBase * newBaseCost) /
+      (onHandBase + receivedBase);
+}
+
 class StockMovementInput {
   final String productId;
   final int quantityDelta;
   final int? costPrice;
+
+  /// Cost per BASE unit (cents). When set on a `receive`, every variant of the
+  /// product has its `cost_price` refreshed to `costPerBaseUnit * conversion_factor`
+  /// so future sales use the latest buying price. Null = don't touch variant costs.
+  final double? costPerBaseUnit;
+
   StockMovementInput({
     required this.productId,
     required this.quantityDelta,
     this.costPrice,
+    this.costPerBaseUnit,
   });
 }
 
@@ -147,6 +171,33 @@ class StockAdjustmentController {
               'INSERT INTO stock_levels (id, branch_id, product_id, quantity, updated_at) VALUES (uuid(), ?, ?, ?, ?)',
               [branchId, productId, adjustmentQty, now],
             );
+          }
+
+          // Blend the new buying price into each variant's cost using a moving
+          // average weighted by the receiving branch's on-hand stock, so future
+          // sales compute margin off the true average cost of stock on the shelf.
+          if (type == 'receive' &&
+              item.costPerBaseUnit != null &&
+              item.costPerBaseUnit! > 0) {
+            final variants = await tx.getAll(
+              'SELECT id, conversion_factor, cost_price FROM product_variants WHERE product_id = ?',
+              [productId],
+            );
+            for (final v in variants) {
+              final cf = (v['conversion_factor'] as int?) ?? 1;
+              if (cf <= 0) continue;
+              final oldCost = (v['cost_price'] as int?) ?? 0;
+              final blendedBase = movingAverageBaseCost(
+                onHandBase: currentQty,
+                oldBaseCost: oldCost / cf,
+                receivedBase: adjustmentQty,
+                newBaseCost: item.costPerBaseUnit!,
+              );
+              await tx.execute(
+                'UPDATE product_variants SET cost_price = ? WHERE id = ?',
+                [(blendedBase * cf).round(), v['id']],
+              );
+            }
           }
         }
       }

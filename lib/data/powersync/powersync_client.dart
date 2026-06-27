@@ -4,6 +4,7 @@ import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'schema.dart';
@@ -164,11 +165,49 @@ class SupabaseConnector extends PowerSyncBackendConnector {
   }
 }
 
+/// Forwards anything logged at WARNING+ (by PowerSync or any other `Logger`) to
+/// Sentry: SEVERE becomes an event, WARNING a breadcrumb. This is how PowerSync
+/// connection/auth/download failures — which otherwise only hit the local log —
+/// become visible in Sentry. Filter by `area:PowerSync`.
+void _wireLoggingToSentry() {
+  Logger.root.level = Level.WARNING;
+  Logger.root.onRecord.listen((rec) {
+    if (rec.level < Level.WARNING) return;
+    // Keep WARNING+ visible in the dev console (our logger replaces the SDK's
+    // default console-printing one). ponytail: drop root level to INFO if you
+    // want verbose sync traces back.
+    debugPrint('[${rec.level.name}] ${rec.loggerName}: ${rec.message}');
+    if (rec.level >= Level.SEVERE) {
+      unawaited(reportDataError(
+        rec.error ?? rec.message,
+        stackTrace: rec.stackTrace,
+        area: rec.loggerName.isEmpty ? 'log' : rec.loggerName,
+        operation: 'log',
+        tags: {'logger': rec.loggerName},
+        data: {'message': rec.message},
+      ));
+    } else {
+      Sentry.addBreadcrumb(Breadcrumb(
+        message: '[${rec.loggerName}] ${rec.message}',
+        category: 'log',
+        level: SentryLevel.warning,
+      ));
+    }
+  });
+}
+
 Future<void> initializePowerSync() async {
+  _wireLoggingToSentry();
   final dir = await getApplicationSupportDirectory();
   final path = join(dir.path, 'paps_n_pops.db');
 
-  db = PowerSyncDatabase(schema: schema, path: path);
+  // Pass a non-detached logger so PowerSync's logs propagate to Logger.root
+  // (the default logger is detached and would never reach our Sentry bridge).
+  db = PowerSyncDatabase(
+    schema: schema,
+    path: path,
+    logger: Logger('PowerSync'),
+  );
   await db.initialize();
 }
 

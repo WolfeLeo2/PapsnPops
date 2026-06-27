@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   sentry_flutter: ^9.22.0
+  logging: ^1.2.0
   flutter:
     sdk: flutter
 

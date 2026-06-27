@@ -76,6 +76,7 @@ class ReceiveStockScreen extends ConsumerStatefulWidget {
 class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
   final Map<String, SelectedProductState> _selectedItems = {};
   StockFlow _currentFlow = StockFlow.receive;
+  bool _enterTotalCost = false; // false = price per unit, true = total for the delivery
 
   final _newReasonController = TextEditingController();
   String? _selectedReasonId;
@@ -136,23 +137,51 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
         final productId = entry.key;
 
         if (_currentFlow == StockFlow.receive) {
-          int? costPrice;
+          // Entered value is either per purchase-unit or the whole-delivery
+          // total (toggled by _enterTotalCost). Normalise to per purchase-unit.
+          final entered =
+              (int.tryParse(
+                        (state.isVolume
+                                ? state.volumeCostCtrl
+                                : state.pieceCostCtrl)
+                            .text
+                            .replaceAll(',', '')) ??
+                    0) *
+              100;
+          int? costPrice; // per purchase unit, cents (recorded on the movement)
+          double? costPerBase; // cents per base unit (drives variant costs)
           if (state.isVolume) {
-            costPrice =
-                (int.tryParse(state.volumeCostCtrl.text.replaceAll(',', '')) ??
-                    0) *
-                100;
+            // Base unit is ml; purchase unit is one container.
+            final containers = state.volumeReceiveContainers;
+            final perContainer = _enterTotalCost && containers > 0
+                ? entered / containers
+                : entered.toDouble();
+            costPrice = perContainer.round();
+            final cSize = state.pw.product.containerSize ?? 1;
+            if (perContainer > 0 && cSize > 0) {
+              costPerBase = perContainer / cSize;
+            }
           } else {
-            costPrice =
-                (int.tryParse(state.pieceCostCtrl.text.replaceAll(',', '')) ??
-                    0) *
-                100;
+            // Purchase unit is the selected variant.
+            final qty = state.pieceQuantity;
+            final perUnit = _enterTotalCost && qty > 0
+                ? entered / qty
+                : entered.toDouble();
+            costPrice = perUnit.round();
+            final v = state.pw.variants.firstWhere(
+              (vv) => vv.id == state.selectedVariantId,
+              orElse: () => state.pw.defaultVariant,
+            );
+            if (perUnit > 0 && v.conversionFactor > 0) {
+              costPerBase = perUnit / v.conversionFactor;
+            }
           }
           inputs.add(
             StockMovementInput(
               productId: productId,
               quantityDelta: state.rawReceiveQuantity,
               costPrice: costPrice,
+              costPerBaseUnit: costPerBase,
             ),
           );
         } else {
@@ -267,7 +296,9 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
                     isScrollControlled: true,
                     builder: (context) => DraggableScrollableSheet(
                       initialChildSize: 0.9,
-                      builder: (_, scrollController) => _buildRightPanel(theme),
+                      expand: false,
+                      builder: (_, scrollController) =>
+                          _buildRightPanel(theme, scrollController: scrollController),
                     ),
                   );
                 },
@@ -376,7 +407,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
     );
   }
 
-  Widget _buildRightPanel(ThemeData theme) {
+  Widget _buildRightPanel(ThemeData theme, {ScrollController? scrollController}) {
     final cs = theme.colorScheme;
     final isOwner = ref.read(authProvider.notifier).isOwner;
     final reasonsAsync = ref.watch(adjustmentReasonsProvider);
@@ -387,6 +418,7 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
         children: [
           Expanded(
             child: ListView(
+              controller: scrollController,
               padding: const EdgeInsets.all(24),
               children: [
                 if (_currentFlow == StockFlow.adjust) ...[
@@ -447,6 +479,19 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+                if (_currentFlow == StockFlow.receive) ...[
+                  const SizedBox(height: 16),
+                  SegmentedButton<bool>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(value: false, label: Text('Price per unit')),
+                      ButtonSegment(value: true, label: Text('Total for delivery')),
+                    ],
+                    selected: {_enterTotalCost},
+                    onSelectionChanged: (s) =>
+                        setState(() => _enterTotalCost = s.first),
+                  ),
+                ],
                 const SizedBox(height: 32),
 
                 Text(
@@ -587,9 +632,11 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             controller: state.pieceCostCtrl,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'Buying Price per unit (KES)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: _enterTotalCost
+                  ? 'Total paid for this delivery (KES)'
+                  : 'Buying Price per unit (KES)',
+              border: const OutlineInputBorder(),
             ),
           ),
         ],
@@ -634,7 +681,9 @@ class _ReceiveStockScreenState extends ConsumerState<ReceiveStockScreen> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: InputDecoration(
-              labelText: 'Buying Price per $containerName (KES)',
+              labelText: _enterTotalCost
+                  ? 'Total paid for this delivery (KES)'
+                  : 'Buying Price per $containerName (KES)',
               border: const OutlineInputBorder(),
             ),
           ),

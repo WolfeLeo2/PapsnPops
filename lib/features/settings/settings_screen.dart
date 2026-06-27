@@ -12,6 +12,7 @@ import 'settings_provider.dart';
 import 'staff_settings.dart';
 import 'user_accounts_screen.dart';
 import 'widgets/app_version_tile.dart';
+import 'widgets/sync_reset_tile.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -151,6 +152,9 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+        const Divider(),
+        _buildSectionHeader(context, 'Sync'),
+        const SyncResetTile(),
         const Divider(),
         _buildSectionHeader(context, 'About'),
         const AppVersionTile(),
