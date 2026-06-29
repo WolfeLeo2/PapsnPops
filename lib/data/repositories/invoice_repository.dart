@@ -4,6 +4,7 @@ import '../../domain/models/sale.dart';
 import '../../domain/models/sale_item.dart';
 import '../powersync/powersync_client.dart';
 import '../../core/utils/error_reporting.dart';
+import '../../domain/sale_validation.dart';
 
 final invoiceRepositoryProvider = Provider<InvoiceRepository>((ref) {
   return InvoiceRepository();
@@ -48,6 +49,7 @@ class InvoiceRepository {
     Sale sale,
     List<SaleItem> items,
   ) async {
+    assertSaleValid(sale, items);
     await db.writeTransaction((tx) async {
       // 1. Insert sale using dynamically generated SQL from row map
       final saleRow = sale.toRow();
